@@ -1,0 +1,25 @@
+<!-- Barra de navegación -->
+<mat-toolbar color="primary">
+  <button mat-icon-button (click)="drawer.toggle()">
+      <mat-icon>menu</mat-icon>
+  </button>
+  <span [routerLink]="['home']">Ngx-generic-tables Showcase</span>
+  <span class="example-spacer"></span>
+</mat-toolbar>
+
+
+<!-- Contenido de la web -->
+<mat-drawer-container class="example-container" autosize>
+  <mat-drawer #drawer opened class="example-sidenav" mode="side">
+      <div class="elementoBarra" [routerLink]="['components']"> Single control components</div>
+      <div class="elementoBarra" [routerLink]="['form']"> Generic Form Dialog</div>
+      <div class="elementoBarra" [routerLink]="['directives']"> Directives</div>
+      <div class="elementoBarra" [routerLink]="['classes']"> Classes and enums</div>
+  </mat-drawer>
+
+  <div class="example-sidenav-content">
+      <router-outlet></router-outlet>
+  </div>
+
+</mat-drawer-container>
+

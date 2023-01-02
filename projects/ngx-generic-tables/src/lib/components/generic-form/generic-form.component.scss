@@ -1,0 +1,22 @@
+@import '../../styles/buttons.scss';
+@import '../../styles/dialog.scss';
+.btnCancelar {
+  color: white;
+}
+
+.btnCerrar {
+  color: white;
+}
+
+.mat-checkbox {
+  padding-top: 30px;
+  padding-bottom: 10px;
+}
+
+.example-spacer {
+  flex: 1 1 auto;
+}
+.eleFormulario {
+  width: 100%;
+  margin-bottom: 8px;
+}

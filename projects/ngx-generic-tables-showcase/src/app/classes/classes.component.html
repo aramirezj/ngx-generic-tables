@@ -1,0 +1,232 @@
+<h1>Classes and enums of the library </h1>
+
+<h2 id="ngxworkspace">Classes / interfaces:</h2>
+<h3>GF_Form</h3>
+<p>Class that can be used when using the GenericFormComponent. Its the class that saves all the information of how the
+    component should work.</p>
+<pre>
+    <code class="language-js">
+
+
+
+/** Class used for the management of generic and specific forms, shown later in GFGenericFormComponent */
+export class GF_Form&#60;T> &#123;
+  /** Element being treated in case the form is of type edition or inspection */
+  entity: T;
+  /** List of GF_FormElements to work with */
+  controls: GF_FormElement[] = [];
+  /** Original element, used in edition forms to keep track of the original element */
+  originalEntity: T;
+  /** Extra functions to be executed through buttons */
+  extraActions: GF_ExtraAction[] = [];
+  /** Request that the form could execute before it closes */
+  APIRequest?: &#123;
+    creation?: GF_APIRequest;
+    edition?: GF_APIRequest;
+  } = &#123;};
+
+  constructor(
+    /** Type of the form  */
+    public type: GF_TypeForm,
+    /** The model of the entity.  */
+    public model: string[],
+    /** The names to display in the controls of the form */
+    public visual: string[],
+    /** The title of the form */
+    public title: string
+  )
+
+  /**
+   * REPLACE a list of validators, important, only replace, no concats.
+   * @param validators Validators list
+   * @param controlsName List with the name of the controls
+   */
+  setValidations(validators: ValidatorFn[], controlsName?: string[]): void
+
+  /**
+   * Set as required a list of controls
+   *
+   * @param controlsName Lista de controles. By default all form
+   */
+  setRequired(controlsName: string[] = this.model): void
+
+  /**
+   * Recover a element of the form
+   *
+   * @param controlName Name of the control to get
+   * @returns The form element
+   */
+  getElement(controlName: string): GF_FormElement
+
+  /**
+   * Add/Replace an element from the form
+   *
+   * @param controlName Name of the control
+   * @param formElement Form element to add
+   */
+  addElement(controlName: string, formElement: GF_FormElement): GF_FormElement
+
+  /**
+   * Add/Replace a list of elements
+   *
+   * @param nombre nombre del control del elemento
+   * @param elemento elemento a insertar
+   */
+  addElements(controlsName: string[], formElements: GF_FormElement[]): void
+
+  /**
+   * Disable a list of controls
+   *
+   * @param controlsName List of names of the controls to disable
+   */
+  disableControls(controlsName: string[] = this.model): void
+
+  /**
+   * Enable a list of controls
+   *
+   * @param controlsName List of names of the controls to enable. By default all the form
+   */
+  enableControls(controlsName: string[] = this.model): void
+
+  /**
+   * Change the type of a list of controls
+   *
+   * @param type Type to change. EX: 'date | text | number | select | textArea | checkbox '
+   * @param controlsName List of names of the controls
+   */
+  changeTypeControl(type: GF_TypeControl, controlsName: string[]): void
+
+  /**
+   * Change the type of form
+   *
+   * @param elemento Element to assoc, by default is empty
+   * @param tipo Type of form following the enum GF_TypeForm
+   * @param titulo Title of the form. Used in the dialog
+   */
+  changeTypeForm(entity: T = &#123;} as T, type?: GF_TypeForm, title?: string): void
+}
+
+        </code>
+</pre>
+
+
+<h3>GF_FormElement</h3>
+<p>Class used by GF_Form. Represent each control of the GF_Form or each property of the object its using</p>
+<pre>
+    <code class="language-js">
+/** The reference of a element of a form, a control */
+export class GF_FormElement &#123;
+  /** FormControl binded to the element */
+  control: FormControl;
+  constructor(
+    /** Identifier name of the form element */
+    public name: string,
+    /** Type of control. By default text */
+    public type: GF_TypeControl = GF_TypeControl.TEXT,
+    /** If the control is disabled */
+    public disabled: boolean = false,
+    /** If its a select, can have the observable of the information of the list */
+    public list?: Observable&#60;any> | any[],
+    /** If select, and if object, where should get the info to display */
+    public label?: string,
+    /** If select, and if object, second label */
+    public secondLabel?: string,
+    /** If select, and if object, what info should retrieve, if null, retrieves the whole object */
+    public model?: string,
+    /** If select, if it can use multiple object */
+    public multiple?: boolean,
+    /** If select, and if object, whats the key of the object */
+    public key?: string
+  ) &#123;
+    this.type = this.type ?? GF_TypeControl.TEXT;
+    this.control = new FormControl(&#123; value: null, disabled: this.disabled });
+  }
+}
+
+        </code>
+    </pre>
+
+<h3>GF_ExtraAction</h3>
+<p>Can be assigned to the GF_Form property extraActions. If assigned the form will show extra buttons what will execute
+    it.</p>
+<pre>
+    <code class="language-js">
+/** If the form should shows buttons to execute functions */
+export interface GF_ExtraAction &#123;
+    /** Label for the button */
+    label: string;
+    /** Function to execute */
+    function: Function;
+    /** If the action should close the form when it finish */
+    close: boolean;
+}
+        </code>
+        </pre>
+<h3>GF_APIRequest</h3>
+<p>Class used in execute api request from the generic form. For example if the form of the type creation or edition,
+    could be assigned to the GF_Form and
+    in the dialog of the form when the user save the form, its not going to close till the request its executed and will
+    retrieve the result
+</p>
+<pre>
+        <code class="language-js">
+export class GF_APIRequest &#123;
+    constructor(
+        /** Request to execute */
+        public request: Function,
+        /**Params that could need the query, it can be used the literal 'OBJECT' to pass the whole object. */
+        public params: string[] = [],
+        /** List of pair key value that will be setted in the element and can be used as params */
+        public parametersToElement?: &#123;},
+        /** List of pair key value that can be used as params directly to the Path. They do no add information to the element */
+        public parametersToPath?: &#123;}
+    ) &#123; }
+}
+</code>
+</pre>
+
+<h2 id="ngxworkspace">Enums:</h2>
+<h3>GF_TypeForm</h3>
+<p>Enum to decide the type of the GF_Form and how the GenericFormComponent will work</p>
+<pre>
+    <code class="language-js">
+export enum GF_TypeForm &#123;
+    CREATION = 'creation',
+    EDITION = 'edition',
+    INSPECTION = 'inspection',
+}
+</code>
+</pre>
+<h3>GF_TypeControl</h3>
+<p>Enum to decide the type of control that will be the GF_FormElement</p>
+<pre>
+    <code class="language-js">
+export enum GF_TypeControl &#123;
+    TEXT = 'text',
+    NUMBER = 'number',
+    CHECKBOX = 'checkbox',
+    DATE = 'date',
+    SELECT = 'select',
+    SELECTBOOLEAN = 'booleanSelect',
+    SELECTMASTER = 'masterSelect',
+    TEXTAREA = 'textArea',
+    CONFIRMATION = 'confirmation'
+}
+        
+</code>
+</pre>
+<h3>GF_TypeConversion</h3>
+<p>Enum to decide the type of the conversion applied to the directive gf-Conversion</p>
+<pre>
+    <code class="language-js">
+export enum GF_TypeConversion &#123;
+    UPPERCASE = 'uppercase',
+    LOWERCASE = 'lowercase',
+    NUMBER = 'number',
+    PERCENTAGE = 'percentage',
+    SPACE = 'space',
+    UPPERCASESPACE = 'uppercaseSpace',
+    LOWERCASESPACE = 'lowercaseSpace',
+}
+</code>
+</pre>

@@ -1,0 +1,95 @@
+<h1>Control components <em>(standalone each one)</em></h1>
+
+<h1 id="ngxworkspace">How to use them:</h1>
+<p>Import the desired component in section of imports of the module you want to use</p>
+
+
+<h2 id="development-server">GFConfirmationComponent:</h2>
+<p>Is a control component that shows some chips button for allowing the user to select Yes or No</p>
+
+<h2 id="development-server">Example working:</h2>
+<gf-confirmation description="Do you like this library?"></gf-confirmation>
+<h2>Example of code:</h2>
+<pre>
+<code class="language-html">
+&#60;gf-confirmation formControlName="question" description="Do you like this library?"&#62;&#60;/gf-confirmation&#62;
+</code>
+</pre>
+
+<h4>Inputs parameters:</h4>
+<pre>
+    <code class="language-js">
+/** Description of the control */
+@Input() description: string | undefined;
+    </code>
+</pre>
+
+<h2 id="development-server">GFMasterSelectComponent:</h2>
+<p>Is a control component that shows a select based control with a filter, and alowing different things like, pass an
+    observable and allow the component
+    to retrieve the information, list an array of objects, telling the component the property(label) that will be used
+    to show information about the object
+    and also if the value to retrieve when you choose an option, should be the whole object or just a property of it
+</p>
+
+<h2 id="development-server">Example working:</h2>
+
+<form [formGroup]="form">
+    <gf-master-select [data]="products" label="name" secondLabel="price" placeholder="Select one product" model="id"
+        formControlName="product"></gf-master-select>
+    <p>The id of the selected product is {{form.value.product}}</p>
+</form>
+
+<h2>Example of code:</h2>
+<pre>
+    <code class="language-js">
+    //Your component
+    form:FormGroup = new FormGroup(&#123;product:new FormControl()})
+    products: Product[] = [
+        &#123; id: 1, name: 'Leather Sofa', price: '$999.99' },
+        &#123; id: 2, name: 'Coffee Table', price: '$149.99' },
+        &#123; id: 3, name: 'Dining Table', price: '$399.99' },
+        &#123; id: 4, name: 'Bedroom Set', price: '$799.99' },
+        &#123; id: 5, name: 'Loveseat', price: '$449.99' },
+        &#123; id: 6, name: 'Rug', price: '$99.99' },
+        &#123; id: 7, name: 'Floor Lamp', price: '$69.99' },
+        &#123; id: 8, name: 'Bookcase', price: '$199.99' },
+        &#123; id: 9, name: 'Accent Chair', price: '$129.99' },
+        &#123; id: 10, name: 'Outdoor Patio Set', price: '$799.99' }
+    ];
+    </code>
+<code class="language-html">
+    &#60;!-- Your template-->
+    &#60;form [formGroup]="form">
+        &#60;gf-master-select [data]="products" label="name" model="id" formControlName="product" secondLabel="price"
+     placeholder="Select one product"&#62;&#60;/gf-master-select&#62;
+    &#60;/form>
+</code>
+
+</pre>
+
+<h4>Inputs parameters:</h4>
+<pre>
+    <code class="language-js">
+/** Source data */
+@Input() data: any[] | Observable&#60;any> = [];
+/** If the source data are objects, and this is setted, it will retrieve the property of the object. If not, the select will retrieve the whole object */
+@Input() model: string | undefined;
+/** If the source data are objects, it will be neccesary to get the property that is gonna be used to display information */
+@Input() label: string | undefined;
+/** If the source data are objects, it can be used to get a second property that is gonna be used to display information */
+@Input() secondLabel: string | undefined;
+/** Placeholder that will be displayed */
+@Input() placeholder: string | undefined;
+/** Extra information   */
+@Input() hint: string = '';
+/** To control if the input search should be displayed or not */
+@Input() searcher: boolean = true;
+/** To control if the select can accept multiple choices */
+@Input() multiple: boolean = false;
+/** To give a custom function search. The params in the function has to be (term: string, item: any) */
+@Input() customSearch: any;
+/** If the source data are objects, it can be used to specify a primary key so it can compare the item faster */
+@Input() key: string | undefined;
+    </code>
+</pre>

@@ -1,0 +1,141 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "ngxGenericForm": {
+      "projectType": "library",
+      "root": "projects/ngx-generic-tables",
+      "sourceRoot": "projects/ngx-generic-tables/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/ngx-generic-tables/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/ngx-generic-tables/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/ngx-generic-tables/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-builders/jest:run",
+          "options": {
+            "tsConfig": "projects/ngx-generic-tables/tsconfig.spec.json"
+          }
+        },
+        "deploy": {
+          "builder": "ngx-deploy-npm:deploy",
+          "options": {
+            "access": "public",
+            "buildTarget": "production"
+          }
+        }
+      }
+    },
+    "ngxGenericFormShowcase": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "root": "projects/ngx-generic-tables-showcase",
+      "sourceRoot": "projects/ngx-generic-tables-showcase/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/ngx-generic-tables-showcase",
+            "index": "projects/ngx-generic-tables-showcase/src/index.html",
+            "main": "projects/ngx-generic-tables-showcase/src/main.ts",
+            "polyfills": "projects/ngx-generic-tables-showcase/src/polyfills.ts",
+            "tsConfig": "projects/ngx-generic-tables-showcase/tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              "projects/ngx-generic-tables-showcase/src/favicon.ico",
+              "projects/ngx-generic-tables-showcase/src/assets"
+            ],
+            "styles": [
+              "projects/ngx-generic-tables-showcase/src/styles.scss",
+              "@angular/material/prebuilt-themes/indigo-pink.css"
+            ],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kb",
+                  "maximumError": "1mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kb",
+                  "maximumError": "4kb"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "projects/ngx-generic-tables-showcase/src/environments/environment.ts",
+                  "with": "projects/ngx-generic-tables-showcase/src/environments/environment.prod.ts"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "configurations": {
+            "production": {
+              "browserTarget": "ngxGenericFormShowcase:build:production"
+            },
+            "development": {
+              "browserTarget": "ngxGenericFormShowcase:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "ngxGenericFormShowcase:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-builders/jest:run",
+          "options": {
+            "tsConfig": "projects/ngx-generic-tables-showcase/tsconfig.spec.json",
+            "assets": [
+              "projects/ngx-generic-tables-showcase/src/favicon.ico",
+              "projects/ngx-generic-tables-showcase/src/assets"
+            ],
+            "styles": [
+              "projects/ngx-generic-tables-showcase/src/styles.scss",
+              "@angular/material/prebuilt-themes/indigo-pink.css"
+            ],
+            "scripts": []
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,62 @@
+<h1>GFFormComponent <em>(standalone)</em></h1>
+
+<h1 id="ngxworkspace">How to start:</h1>
+<p>Import <span class="comando">GFFormComponent</span> in section of imports of the module you want to use and also the service <span class="comando">GFFormService</span> in the providers</p>
+
+
+<h2 id="development-server">Whats for:</h2>
+<p>Is a component that recieves an object of type GF_Form. With this object, it can generate a popup that shows a form with the 
+    specifications that you coded. For example, it can be use with an object called productForm:GF_Form that specifies 4 attributes,
+    each one with differente types, and you can open this form for creating, updating, and inspecting.
+</p>
+
+<h2 id="development-server">Example working:</h2>
+<button mat-raised-button color="accent" (click)="createProduct()">Create product</button>
+<button mat-raised-button color="warn" (click)="editProduct()">Edit product</button>
+<button mat-raised-button color="primary" (click)="inspectProduct()">Inspect product</button>
+<h2>Example of code:</h2>
+<pre><code class="language-js">
+
+    gfFormProduct:GF_Form&#60;Product&#62;;
+   
+    constructor(private formService:GFFormService)&#123;
+        this.configForms();
+    }
+
+    configForms()&#123;
+        this.types$ = //Your get api of the types of products that returns an observable
+        this.gfFormProduct = new GF_Form(GF_TypeForm.CREATION,['code','name','type','stock'],['Code','Full name','Type','Stock'],'Creating a product');
+        this.gfFormProduct.addRequired(['name','type']);
+        this.formProduct.changeTypeControl(GF_TypeControl.NUMBER, ['stock']);
+        this.formProduct.addElement('type',new GF_FormElement('type',GF_TypeControl.SELECTMASTER,false,this.types$,'name',undefined,'id'));
+    }
+
+    createProduct()
+        this.gfFormProduct.changeTypeForm(GF_TypeForm.CREATION);
+                                                                //new product is the result when you accept the form
+        this.formService.showForm(this.gfFormProduct).subscribe(newProduct => &#123;
+            //Your api call for sending the new product
+        });
+    }
+
+    editProduct(productToEdit:Product)&#123;
+        this.gfFormProduct.changeTypeForm(GF_TypeForm.EDITION,productToEdit);
+        this.formService.showForm(this.gfFormProduct).subscribe(updatedProduct => &#123;
+            //Your api call for updating the product
+        });
+    }
+
+    inspectProduct(product:Product)&#123;
+        //It will disable the form
+        this.gfFormProduct.changeTypeForm(GF_TypeForm.INSPECT,product);
+        this.formService.showForm(this.gfFormProduct).subscribe();
+    }
+
+</code>
+</pre>
+
+
+
+
+
+

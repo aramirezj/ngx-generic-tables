@@ -1,0 +1,43 @@
+@import '../../styles/buttons.scss';
+
+p {
+  font-family: Lato;
+}
+
+input {
+  background: #ffffff;
+  height: 50px;
+}
+
+div {
+  background-color: #ffffff;
+  padding-left: 14px;
+  padding-right: 14px;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+mat-icon {
+  color: rgba(0, 0, 0, 0.54);
+  line-height: 1 !important;
+}
+
+.mat-option {
+  white-space: unset !important;
+  overflow: unset !important;
+  text-overflow: ellipsis !important;
+  height: unset !important;
+  line-height: 1.2 !important;
+  padding: 12px;
+  transition: all 3s ease;
+}
+
+#inputBusqueda {
+  box-sizing: border-box;
+  padding: 8px;
+  padding-left: 16px;
+  border: none;
+  width: 100%;
+}

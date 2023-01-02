@@ -1,0 +1,85 @@
+<h1>Directives <em>(standalone each one)</em></h1>
+
+<h1 id="ngxworkspace">How to use them:</h1>
+<p>Import the desired directive in section of imports of the module you want to use</p>
+
+
+<h2 id="development-server">GFConversionDirective:</h2>
+<p>Is a directive that can be applied to an input type text and will transform the value of that input depends of the
+    parameters given</p>
+
+<h3 id="development-server">Example working:</h3>
+<mat-form-field appearance="outline">
+    <mat-label>Only number</mat-label>
+    <input matInput type="text" gf-Conversion="number">
+</mat-form-field>
+<mat-form-field appearance="outline">
+    <mat-label>Only uppercase</mat-label>
+    <input matInput type="text" gf-Conversion="uppercase">
+</mat-form-field>
+<mat-form-field appearance="outline">
+    <mat-label>Without spaces</mat-label>
+    <input matInput type="text" gf-Conversion="space">
+</mat-form-field>
+<h3>Example of code:</h3>
+<pre>
+<code class="language-html">
+    &#60;mat-form-field appearance="outline">
+        &#60;mat-label>Only number&#60;/mat-label>
+        &#60;input matInput type="text" gfConversion="number">
+    &#60;/mat-form-field>
+    &#60;mat-form-field appearance="outline">
+        &#60;mat-label>Only uppercase&#60;/mat-label>
+        &#60;input matInput type="text" gfConversion="uppercase">
+    &#60;/mat-form-field>
+    &#60;mat-form-field appearance="outline">
+        &#60;mat-label>Without spaces&#60;/mat-label>
+        &#60;input matInput type="text" gfConversion="space">
+    &#60;/mat-form-field>
+</code>
+</pre>
+<h3>Types:</h3>
+<pre>
+   <code class="language-js">
+    export enum GF_TypeConversion &#123;
+        UPPERCASE = 'uppercase',
+        LOWERCASE = 'lowercase',
+        NUMBER = 'number',
+        PERCENTAGE = 'percentage',
+        SPACE = 'space',
+        UPPERCASESPACE = 'uppercaseSpace',
+        LOWERCASESPACE = 'lowercaseSpace',
+   } 
+    </code> 
+</pre>
+
+<h2 id="development-server" style="margin-top: 5vh;">GFMatErrorMessagesDirective:</h2>
+<p>Directive of component that can be added to a mat-error and it will display automatically error messages, so with only 1 tag of mat-error you can handle all the errors</p>
+<h3 id="development-server">Example working:</h3>
+<form [formGroup]="form">
+    <mat-form-field  style="width: 50%" appearance="outline">
+        <mat-label>Field required, minlength 3 characters and email format</mat-label>
+        <input matInput type="text" formControlName="email">
+        <mat-error gf-matErrorMessages></mat-error>
+    </mat-form-field>
+</form>
+
+<h3 id="development-server">Example of code:</h3>
+<pre>
+    <code class="language-js">
+    form:FormGroup = new FormGroup(&#123;
+        email: new FormControl(null,[Validators.required,Validators.minLength(3),Validators.email])
+    });
+    </code>
+</pre>
+<pre>
+    <code class="language-html">
+        &#60;form [formGroup]="form">
+            &#60;mat-form-field  style="width: 50%" appearance="outline">
+                &#60;mat-label>Field required, minlength 3 characters and email format&#60;/mat-label>
+                &#60;input matInput type="text" formControlName="email">
+                &#60;mat-error gf-matErrorMessages>&#60;/mat-error>
+            &#60;/mat-form-field>
+        &#60;/form>
+    </code>
+</pre>

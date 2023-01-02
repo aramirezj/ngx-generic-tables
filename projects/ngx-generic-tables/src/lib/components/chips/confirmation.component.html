@@ -1,0 +1,21 @@
+<div class="chipBox">
+  <span class="description" *ngIf="description">{{ description }}</span>
+  <div class="chips">
+    <div [ngClass]="{
+        chip: true,
+        disabled: disabled,
+        error:errorState,
+        green: field === true
+      }" (click)="writeValue(true)">
+      {{'YES' | translate}}
+    </div>
+    <div [ngClass]="{
+        chip: true,
+        disabled: disabled,
+        error:errorState,
+        red: field === false
+      }" (click)="writeValue(false)">
+      {{'NO' | translate}}
+    </div>
+  </div>
+</div>

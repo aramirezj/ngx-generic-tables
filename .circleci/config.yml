@@ -1,0 +1,11 @@
+# .circleci/config.yml
+jobs:
+  init-deploy:
+    executor: my-executor
+    steps:
+      - attach_workspace:
+          at: /home/circleci/repo/
+      # Set NPM token to be able to publish
+      - run: echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' > /home/circleci/repo/.npmrc
+      - run: npm whoami
+      - run: npx nx deploy ngx-generic-tables
