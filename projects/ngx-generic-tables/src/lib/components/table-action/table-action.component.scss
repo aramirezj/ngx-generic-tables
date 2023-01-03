@@ -1,0 +1,20 @@
+.disabled {
+    color: gray;
+    pointer-events: none !important;
+}
+
+em {
+    cursor: pointer;
+    margin-right: 3%;
+}
+
+//Cuando es menu contextual
+button {
+    cursor: pointer;
+    width: 100%;
+    text-align: justify !important;
+    margin: 0.5em 2em 0.5em 0.5em;
+}
+.iconoMenu{
+    vertical-align: middle!important;
+}

@@ -1,0 +1,181 @@
+<!-- Busqueda -->
+<gt-searcher *ngIf="search" (notify)="toSearch($event)"> </gt-searcher>
+<!-- Tabla en sí-->
+<div class="tablaMaterial" [id]="idTabla">
+    <!-- Encabezado de la tabla -->
+    <div class="filaEncabezado">
+        <span *ngIf="checkboxMode" class="elementoEncabezado">
+            <mat-checkbox (click)="$event.stopPropagation();" [checked]="casillaMaestra.all"
+                [indeterminate]="casillaMaestra.indeterminate" (change)="clickTodasCasillas($event)">
+            </mat-checkbox>
+        </span>
+        <div *ngFor="let titulo of visual;let i=index"
+            [class]="'elementoEncabezado pointer ' +idTabla+ '-columna-'+model[i]">
+            <span [innerHTML]="titulo" (click)="changeSort(model[i])"></span>
+            <!--Lógica de flechas para la ordenación y el palo para el redimensionamiento-->
+            <ng-container [ngTemplateOutlet]="resizeYOrden" [ngTemplateOutletContext]="{i:i}"></ng-container>
+        </div>
+
+
+        <!--Encabezado de las acciones -->
+        <div [class]="'elementoEncabezado elementosAcciones '+idTabla+'-columna-acciones'">
+            <span>Acciones</span>
+        </div>
+
+
+
+    </div>
+
+    <!-- Condicional para la paginación, para saber que elementos mostrar en pantalla -->
+    <div class="contenidoTabla">
+        <ng-container *ngFor="let elemento of dataToShow;let i = index">
+            <ng-container [ngTemplateOutlet]="paginacionLocalT"
+                [ngTemplateOutletContext]="{elemento:elemento,i:i}"></ng-container>
+            <ng-container *ngIf="elemento===selectedElement && elemento[nextTable]?.length > 0"
+                [ngTemplateOutlet]="elementoExpandido" [ngTemplateOutletContext]="{elemento:elemento}">
+            </ng-container>
+        </ng-container>
+
+
+    </div>
+</div>
+<mat-paginator *ngIf="paginator" [length]="pageEvent.length" [pageSize]="pageEvent.pageSize"
+    [pageSizeOptions]="pageSizeOptions" [pageIndex]="pageEvent.pageIndex" (page)="pagination($event)">
+</mat-paginator>
+
+
+<!-- PAGINACIONLOCAL Template para la evaluación de datos si utiliza la paginación local -->
+<ng-template #paginacionLocalT let-elemento='elemento' let-i='i'>
+    <div *ngIf="((pageEvent.pageIndex+1)*pageEvent.pageSize) > i && i >= ((pageEvent.pageIndex)*pageEvent.pageSize)"
+        [class]="elemento === selectedElement ? 'filaContenido filaSeleccionada pointer' : selectable ? 'filaContenido pointer' : 'filaContenido' "
+        (click)="select(elemento)" (contextmenu)="open($event, elemento); $event.preventDefault();">
+        <!--Contenido del TD-->
+        <ng-template [ngTemplateOutlet]="TDContenido" [ngTemplateOutletContext]="{elemento:elemento}">
+        </ng-template>
+    </div>
+</ng-template>
+
+<!-- PAGINACIONASINCRONA Template para la evaluación de datos si usa la paginación asincrona-->
+<ng-template #paginacionAsincronaT let-elemento='elemento' let-i='i'>
+    <div [class]="elemento === selectedElement ? 'filaContenido filaSeleccionada pointer' : selectable ? 'filaContenido pointer' : 'filaContenido' "
+        (click)="select(elemento)" (contextmenu)="open($event, elemento); $event.preventDefault();">
+        <!--Contenido del TD-->
+        <ng-template [ngTemplateOutlet]="TDContenido" [ngTemplateOutletContext]="{elemento:elemento}">
+        </ng-template>
+    </div>
+</ng-template>
+
+<!-- TDCONTENIDO Template utilizada para cargar el TD en cuestión -->
+<ng-template #TDContenido let-elemento='elemento'>
+
+    <!--Checkbox si tiene checkboxMode-->
+    <span *ngIf="checkboxMode" class="elementoContenido">
+        <mat-checkbox (click)="$event.stopPropagation()" (change)="clickCasilla(elemento,$event)"
+            [checked]="elemento['tSeleccionado']" [indeterminate]="elemento['tIndeterminate']">
+        </mat-checkbox>
+    </span>
+    <!--Elementos normales del model-->
+    <div *ngFor="let atributo of model;let i = index" [class]="'elementoContenido ' +idTabla+ '-columna-'+atributo">
+        <!-- Recibe el model splitted por si tuviera que hacer una indexación -->
+        <ng-template #modeloSplitted let-splitted="splitted" let-atributo="atributo">
+            <ng-container [ngSwitch]="splitted.length">
+                <gt-table-element *ngSwitchCase=1 [field]="elemento[atributo]">
+                </gt-table-element>
+                <gt-table-element *ngSwitchCase=2 [field]="elemento[splitted[0]]?.[splitted[1]]">
+                </gt-table-element>
+                <gt-table-element *ngSwitchCase=3 [field]="elemento[splitted[0]]?.[splitted[1]]?.[splitted[2]]">
+                </gt-table-element>
+                <gt-table-element *ngSwitchCase=4
+                    [field]="elemento[splitted[0]]?.[splitted[1]]?.[splitted[2]]?.[splitted[3]]">
+                </gt-table-element>
+                <gt-table-element *ngSwitchCase=5
+                    [field]="elemento[splitted[0]][splitted[1]]?.[splitted[2]]?.[splitted[3]]?.[splitted[4]]">
+                </gt-table-element>
+            </ng-container>
+        </ng-template>
+
+        <!-- Invoca al template que recibe el splitted y carga los elementos TD-->
+        <ng-container [ngTemplateOutlet]="modeloSplitted"
+            [ngTemplateOutletContext]="{atributo:atributo,splitted:atributo.split('.')}">
+        </ng-container>
+    </div>
+
+
+
+    <!-- Acciones de la tabla-->
+    <div [class]="'elementoContenido elementosAcciones '+idTabla+'-columna-acciones'">
+        <ng-container *ngIf="!actionMenu">
+            <gt-table-action (click)="$event.stopPropagation()" *ngFor="let accion of actions" [action]="accion"
+                [element]="elemento" (clicked)="doAction(elemento,$event)"></gt-table-action>
+        </ng-container>
+        <ng-container *ngIf="actionMenu && actions">
+            <em class="material-icons" [matMenuTriggerFor]="menu">more_vert</em>
+            <mat-menu #menu="matMenu">
+                <gt-table-action *ngFor="let accion of actions" [action]="accion" [element]="elemento"
+                    [actionMenu]="actionMenu" (clicked)="doAction(elemento,$event)"></gt-table-action>
+            </mat-menu>
+        </ng-container>
+
+        <em class="material-icons iconExpandir" *ngIf="!expansionRequest ?
+        elemento[nextTable]?.length : true"
+            [matTooltip]="selectedElement === elemento ? 'Contraer elemento': 'Expandir elemento'"
+            matTooltipPosition="above">{{selectedElement === elemento ? 'remove_circle' : 'add_box'}}</em>
+
+        <em class="material-icons iconExpandir hiddenIcon" matTooltipPosition="above"></em>
+
+
+        <div class="clear"></div>
+    </div>
+</ng-template>
+
+<!-- ELEMENTOEXPANDIDO Template utilizada para reflejar el contenido de la expansión -->
+<ng-template #elementoExpandido let-elemento='elemento'>
+    <div class="elementoExpandido" [@inOutAnimation]>
+        <!-- Propositos para el funcionamiento -->
+        <td class="tdExpandido" colspan="99">
+            <p class="anidacionMensaje">{{childTitle}}</p>
+            <gt-table *ngIf="!nextTableInfinite" [data]="elemento[nextTable]" [visual]="visuals[nestingIndex]"
+                [model]="models[nestingIndex]" [paginator]="false"
+                [fxFlexes]="levelFxFlexes ? levelFxFlexes[nestingIndex] : null"
+                [conditionalActions]="actionLevels ? actionLevels[nestingIndex] : null"
+                [actions]="actionLevels ? actionLevels[nestingIndex] : null" 
+                [checkboxMode]="checkboxMode"
+                 [subjectLoaded]="childrenLoaded"
+                (notify)="notifyChildTable($event, nextTable,false,elemento)">
+            </gt-table>
+            <gt-infinite-table *ngIf="nextTableInfinite" [data]="elemento[nextTable]" [visuals]="visuals"
+                [levels]="levels" [models]="models" [levelTitles]="levelTitles"
+                [actions]="actionLevels ? actionLevels[nestingIndex] : null"
+                [fxFlexes]="levelFxFlexes ? levelFxFlexes[nestingIndex] : null" [infiniteRequests]="infiniteRequests"
+                [paginator]="false" [levelTitles]="levelTitles" [actionLevels]="actionLevels"
+                [actionLevels]="actionLevels"  
+                [nestingIndex]="nestingIndex" [inheritance]="inheritance"
+                
+                [checkboxMode]="checkboxMode"
+                (notify)="notifyChildTable($event, nextTable, true, elemento)">
+            </gt-infinite-table>
+        </td>
+
+    </div>
+</ng-template>
+
+
+<!-- Template para invocar el palito de redimensión -->
+<ng-template #resizeYOrden let-i='i' let-sinOrden='sinOrden'>
+    <em *ngIf="ordenActual.modelo !== model[i] && !sinOrden" class="material-icons flecha">north</em>
+    <em *ngIf="ordenActual.modelo === model[i] && !sinOrden"
+        class="material-icons flechaActivada">{{ordenActual.direccion ===
+        'ASC' ? 'north' : 'south'}}</em>
+    <span class="resize-handle" (mousedown)="onRedimensionarColumna($event, i);$event.stopPropagation();"></span>
+</ng-template>
+
+
+<!-- Menu contextual -->
+<ng-template #menuContextual let-elemento>
+    <section class="menuContextual">
+        <div *ngFor="let accion of actions">
+            <gt-table-action [action]="accion" [element]="elemento" [actionMenu]="true"
+                (clicked)="doAction(elemento,$event)"></gt-table-action>
+        </div>
+    </section>
+</ng-template>

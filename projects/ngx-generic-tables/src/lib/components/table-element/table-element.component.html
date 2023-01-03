@@ -1,0 +1,26 @@
+<ng-container [ngSwitch]="format">
+    <span *ngSwitchCase="'numero'" class="number">
+        {{field | number }}
+    </span>
+    <span *ngSwitchCase="'euro'" class="number">
+        {{field | number : '1.2' }}€
+    </span>
+    <span *ngSwitchCase="'porcentaje'" class="number">
+        {{field| number }}%
+    </span>
+    <span *ngSwitchCase="'texto'" class="elmentText">
+        {{field}}
+    </span>
+    <span *ngSwitchCase="'boolean'">
+        <span> {{coerceBoolean(field) ? 'Yes' : 'No'}}</span>
+    </span>
+    <span *ngSwitchCase="'date'">
+        {{field | date: 'dd/MM/yyyy'}}
+    </span>
+    <span *ngSwitchCase="'dateTime'">
+        {{field | date: 'dd/MM/yyyy HH:mm'}}
+    </span>
+    <span *ngSwitchDefault class="elmentText">
+        {{field}}
+    </span>
+</ng-container>

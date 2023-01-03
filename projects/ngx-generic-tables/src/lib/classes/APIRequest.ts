@@ -1,5 +1,5 @@
 /** Class used in execute api request from the generic form */
-export class GF_APIRequest {
+export class GT_APIRequest {
   constructor(
     /** Request to execute */
     public request: Function,

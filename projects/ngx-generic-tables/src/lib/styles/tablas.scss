@@ -1,0 +1,264 @@
+
+
+//Tabla entera <table>
+.tablaMaterial {
+    display: table;
+    width: 100%;
+    font-family: Tahoma, Verdana, sans-serif;
+    border: 1px solid rgba(0, 0, 0, 0.12) !important;
+}
+
+//TR Encabezado
+.filaEncabezado {
+    background-color: #3f51b5 !important;
+    display: table-row;
+    padding: 8px !important;
+    height: 54px;
+    //TD Encabezado
+    .elementoEncabezado {
+        display: table-cell;
+        padding-left: 16px;
+        padding-right: 16px;
+        position: relative;
+        vertical-align: middle;
+        color: white !important;
+        font-weight: 500 !important;
+        font-family: Roboto, "Helvetica Neue", sans-serif;
+        text-align: left;
+    }
+
+    .elementoEncabezado:hover .resize-handle {
+        opacity: 1;
+        transition: 0.3s ease-in-out;
+    }
+
+    .elementoEncabezado:hover .flecha {
+        opacity: 0.5;
+        transition: 0.3s ease-in-out;
+    }
+}
+
+//Body de la tabla <tbody>
+.contenidoTabla {
+    display: table-row-group;
+    overflow: auto;
+    max-height: 60vh;
+}
+
+//TR Contenido
+.filaContenido {
+    display: table-row;
+    border: 1px solid rgba(0, 0, 0, 0.12) !important;
+    background: white !important;
+    //TD Contenido
+    .elementoContenido {
+        display: table-cell;
+        padding: 6px;
+        padding-left: 16px !important;
+        padding-right: 16px;
+        vertical-align: middle;
+    }
+}
+.filaContenido:nth-child(even) {
+    background-color: whitesmoke !important;
+}
+
+//TD Acciones
+.elementosAcciones {
+    overflow: visible;
+    text-align: right !important;
+    border-left: 1px solid #d6d6d6;
+    white-space: nowrap;
+    padding-right: 32px!important;
+}
+//Cuando se selecciona un TR
+.filaSeleccionada {
+    background-color: #959494 !important;
+    * {
+        color: white !important;
+    }
+    a {
+        color: black !important;
+    }
+}
+.filaSeleccionada:nth-child(even) {
+    background-color: #959494 !important;
+}
+
+.pointer {
+    cursor: pointer;
+}
+.busquedaField {
+    width: 100%;
+}
+.nombreObjeto {
+    color: #3f51b5;
+}
+
+.spanCasillas {
+    padding-right: 1vw;
+}
+
+//Redimensión palo
+.resize-handle {
+    display: inline-block;
+    border-right: 2px solid lightgray;
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    cursor: col-resize;
+    opacity: 0;
+}
+//Redimensión palo
+.resize-handle:hover {
+    width: 20px;
+}
+//Flecha para ordenar
+.flecha {
+    font-size: 16px;
+    vertical-align: sub;
+    margin-left: 0.5vh;
+    opacity: 0;
+    display: inline;
+}
+//Flecha para ordenar
+.flechaActivada {
+    font-size: 16px;
+    vertical-align: sub;
+    margin-left: 0.5vh;
+    opacity: 1;
+}
+
+.selectPro {
+    min-width: 15vw !important;
+}
+
+//Menu contextual
+::ng-deep {
+    .mat-menu-item,
+    .ngx-contextmenu--item-content {
+        border: 0 !important;
+        padding: 4px !important;
+        background: unset!important;
+        color: black!important;
+        mat-icon{
+            color: black!important;
+            vertical-align: bottom!important;
+            margin-right: 2px;
+        }
+        
+    }
+    .ngx-contextmenu--dropdown-menu {
+        border-radius: 4px;
+        background-color: white;
+        padding: 0!important;
+        border: 1px dotted #70757e;
+        li {
+            display: block !important;
+            cursor: pointer!important;
+        }
+        li:hover{
+            background-color: whitesmoke;
+        }
+    }
+}
+
+.menuContextual {
+    background-color: #fafafa!important;
+    font-size: 10pt;
+    z-index: 1000;
+    box-shadow: 0 0 12pt rgba(0, 0, 0, 0.25);
+    border-radius: 4pt;
+    animation: fadeIn 0.1s ease-out;
+    opacity: 1;
+    display: block;
+}
+
+.menuContextual hr {
+    border: none!important;
+    border-bottom: 1px solid #eee;
+}
+
+.menuContextual div {
+    cursor: pointer;
+    display: block;
+    text-decoration: none;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.menuContextual div:hover {
+    background-color: whitesmoke;
+    color: #fff;
+}
+
+.menuContextual div::before {
+    content: "";
+    float: left;
+    height: 1em;
+    display: inline-block;
+}
+
+/* Animatinons */
+@-webkit-keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@-webkit-keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+.is-fadingIn {
+    -webkit-animation: fadeIn 0.1s ease-out;
+    animation: fadeIn 0.1s ease-out;
+    opacity: 1;
+    display: block;
+}
+
+.is-fadingOut {
+    -webkit-animation: fadeOut 0.1s ease-out;
+    animation: fadeOut 0.1s ease-out;
+    opacity: 0;
+    display: block;
+}
+
+::ng-deep {
+    .mat-menu-panel {
+        max-width: none !important;
+        min-width: 0 !important;
+        * {
+            text-align: left !important;
+        }
+    }
+}

@@ -1,10 +1,5 @@
 import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import {
-  GFFormService,
-  GF_Form,
-  GF_TypeForm,
-} from 'projects/ngx-generic-tables/src/public-api';
 
 export interface Persona {
   id?:number;
@@ -30,21 +25,12 @@ export class AppComponent {
     ),
   });
 
-  formService: GFFormService = inject(GFFormService);
 
-  myForm: GF_Form<Persona> = new GF_Form(
-    GF_TypeForm.CREATION,
-    ['nombre', 'apellido'],
-    ['Nombre', 'Apellido'],
-    'Creating my form'
-  );
+
+
 
   ngOnInit() {
-    this.myForm.changeTypeForm(
-      this.personas[0],
-      GF_TypeForm.INSPECTION,
-      'hehe'
-    );
+
     /*this.formService.openForm(this.myForm).subscribe((valor) => {
       console.log(valor);
     });*/

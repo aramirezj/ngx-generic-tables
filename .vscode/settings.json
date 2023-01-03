@@ -1,0 +1,7 @@
+{
+    "fildir.prefixes": [
+        "myproj/",
+        "otherproj/",
+        "projects/"
+    ]
+}

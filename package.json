@@ -21,7 +21,8 @@
     "coverage:library": "jest --config projects/ngx-generic-tables/jest.config.js --coverage --coverageDirectory=../../.coverage",
     "format:test": "prettier --list-different 'projects/**/*.{ts,html}'",
     "format:write": "prettier --write 'projects/**/*.{ts,html}'",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "stats": "ng build ngx-generic-tables-showcase --stats-json && webpack-bundle-analyzer dist/ngx-generic-tables-showcase/stats.json"
   },
   "private": true,
   "dependencies": {

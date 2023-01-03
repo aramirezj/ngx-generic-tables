@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "ngxGenericForm": {
+    "ngx-generic-tables": {
       "projectType": "library",
       "root": "projects/ngx-generic-tables",
       "sourceRoot": "projects/ngx-generic-tables/src",
@@ -39,7 +39,7 @@
         }
       }
     },
-    "ngxGenericFormShowcase": {
+    "ngx-generic-tables-showcase": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {

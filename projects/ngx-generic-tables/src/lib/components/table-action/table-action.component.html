@@ -1,0 +1,8 @@
+<button *ngIf="actionMenu && action.purpose !== 'huecoVacio' " mat-menu-item (click)="clicked.emit(this.action.purpose)"
+    [class]="disabled ? 'disabled' : ''">
+    <mat-icon class="iconoMenu">{{action.icon}}</mat-icon>
+    <span>{{action.description}}</span>
+</button>
+
+<em *ngIf="!actionMenu && action.purpose !== 'configurar'" [matTooltip]="action.description ?? ''" (click)="clicked.emit(this.action.purpose)"
+    matTooltipPosition="above" [class]="disabled ? 'material-icons disabled' : 'material-icons'">{{action.icon}}</em>
