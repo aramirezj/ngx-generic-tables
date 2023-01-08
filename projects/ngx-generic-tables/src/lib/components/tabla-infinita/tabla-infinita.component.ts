@@ -1,14 +1,15 @@
 import { trigger, transition, style, animate } from '@angular/animations';
 import { Overlay } from '@angular/cdk/overlay';
-import { CommonModule } from '@angular/common';
+import { NgFor, NgIf, NgSwitch, NgSwitchCase, NgTemplateOutlet } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Output, Renderer2, ViewChild, ViewContainerRef } from '@angular/core';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject, Subscription } from 'rxjs';
 import { GT_Action } from '../../classes/Accion';
 import { GT_APIRequest } from '../../classes/APIRequest';
+import { GTTranslatePipe } from '../../directives/translate.directive';
 import { SharedService } from '../../shared.service';
 import { GTSearcherComponent } from '../searcher/searcher.component';
 import { GTTableComponent } from '../tabla/tabla.component';
@@ -16,7 +17,7 @@ import { GTTableBase } from '../TablaMaestra';
 import { GTTableActionComponent } from '../table-action/table-action.component';
 import { GTTableElementComponent } from '../table-element/table-element.component';
 
-/** Componente de la Tabla encargada del listado y tratado de elementos */
+/** Componente de la Tabla encargada del listado y tratado de entitys */
 @Component({
     selector: 'gt-infinite-table',
     templateUrl: './tabla-infinita.component.html',
@@ -38,8 +39,8 @@ import { GTTableElementComponent } from '../table-element/table-element.componen
             )])
     ],
     inputs: GTTableBase.commonInputs,
-    standalone:true,
-    imports:[CommonModule, GTSearcherComponent, GTTableElementComponent, GTTableActionComponent, MatCheckboxModule, MatPaginatorModule, MatMenuModule, MatTooltipModule, GTTableComponent]
+    standalone: true,
+    imports: [NgIf, NgFor, NgSwitch, NgSwitchCase, NgTemplateOutlet, GTTranslatePipe, GTSearcherComponent, GTTableElementComponent, GTTableActionComponent, MatCheckboxModule, MatPaginatorModule, MatMenuModule, MatTooltipModule, GTTableComponent]
 })
 export class GTInfiniteTableComponent extends GTTableBase implements OnInit, AfterViewInit {
     /** Child Table instance */
@@ -57,7 +58,7 @@ export class GTInfiniteTableComponent extends GTTableBase implements OnInit, Aft
     /** Collection to know the names of the attributes from which to extract the nesting*/
     @Input() levels!: string[];
     /** Collection to know the titles of the next tables*/
-    @Input() levelTitles!: string[];
+    @Input() levelTitles: string[] = [];
     /** Request that will be executed when expanding the table*/
     @Input() expansionRequest!: GT_APIRequest;
     /** Attribute to keep track of which step of the nesting we are in, starts at 0*/
@@ -79,7 +80,9 @@ export class GTInfiniteTableComponent extends GTTableBase implements OnInit, Aft
     /** If true, it means that the next nesting is another expansion table*/
     nextTableInfinite: boolean = false;
     /** Subject to control when the child table has been loaded */
-    childrenLoaded: BehaviorSubject<any> = new BehaviorSubject(0);
+    childrenLoaded: Subject<any> = new Subject();
+
+    suscriptionChildren: Subscription | null = null;
 
     constructor(
         public override sharedService: SharedService,
@@ -93,7 +96,6 @@ export class GTInfiniteTableComponent extends GTTableBase implements OnInit, Aft
     }
 
     ngOnInit(): void {
-        this.selectable = this.selectable === false ? false : true;
         this.idTabla = `tabla${this.sharedService.getTableId()}`;
         this.sharedService.tableIdCounter++;
         this.preparaTabla();
@@ -107,7 +109,8 @@ export class GTInfiniteTableComponent extends GTTableBase implements OnInit, Aft
     }
 
     /** Preparación inicial de herramientas necesarias para la tabla */
-    preparaTabla(): void {
+    protected preparaTabla(): void {
+        this.selectable = true;
         this.data = this.data ? this.data : [];
         this.dataToShow = this.data.slice();
 
@@ -131,94 +134,79 @@ export class GTInfiniteTableComponent extends GTTableBase implements OnInit, Aft
         if (this.checkboxMode) this.refrescaCasillas();
 
     }
+
+
     /**
-     * Lógica para el refresco de la tabla entera según datos que haya recibido
+     * Updates the data of the table and also the child tables
      *
-     * @param datos Datos nuevos
+     * @param data New data to show
      */
-    refreshData(datos: any): void {
-        this.data = datos ? datos : [];
+    public refreshData(data: any): void {
+        this.data = data ?? [];
         this.dataToShow = this.data.slice();
         if (this.searchApp) this.searchApp.control.reset();
         this.restartPagination();
         this.refreshChildTables();
     }
 
-    /** Refresca las tablas hijas que tengan */
-    refreshChildTables(): void {
+
+    /** Refresh the data of the child tables */
+    public refreshChildTables(): void {
         if (this.childTable) this.childTable.refreshData(this.childTable.data);
         if (this.childInfiniteTable) this.childInfiniteTable.refreshData(this.childInfiniteTable.data);
     }
 
-    /**
-     * Evento de notificación de cuando se ha realizado una acción
-     *
-     * @param elemento Elemento sobre el cual se va a realizar la acción
-     * @param accion Acción a realizar y devolver
-     */
-    doAction(elemento: any, accion: string): void {
-        if (accion === 'deleteAuto') {
-            this.notify.emit({ accion, elemento });
-        } else {
-            switch (accion) {
-                case 'eliminarT':
-                    this.sharedService.showConfirmation(this.prepareMessage(elemento, this.model[0], this.visual[0])).subscribe(accept => {
-                        if (accept) {
-                            this.deleteElement(elemento)
-                            this.sendNotification({ accion, elemento });
-                        }
-                    });
-                    break;
-                case 'eliminar':
-                    this.sharedService.showConfirmation(this.prepareMessage(elemento, this.model[0], this.visual[0])).subscribe(accept => {
-                        if (accept) {
-                            this.sendNotification({ accion, elemento });
-                        }
-                    });
-                    break;
-            }
-        }
-        if (this.overlayRef) this.close();
-    }
+
 
 
     /**
-     * Realiza insercciones a elementos hijos
+     * Insert a new children entity to an especific entity
      *
-     * @param raiz Elemento padre
-     * @param elementoNuevo Elemento a añadir
+     * @param rootEntity entity root
+     * @param childrenEntity children entity to add
      */
-    addNewChildrenElement(raiz: any, elementoNuevo: any): void {
-        const pos = this.data.indexOf(raiz);
+    public addNewChildrenElement(rootEntity: any, childrenEntity: any): void {
+        const pos = this.data.indexOf(rootEntity);
         if (pos !== -1) {
-            this.data[pos][this.nextTable] ? this.data[pos][this.nextTable].push(elementoNuevo) : this.data[pos][this.nextTable] = [elementoNuevo];
+            this.data[pos][this.nextTable] ? this.data[pos][this.nextTable].push(childrenEntity) : this.data[pos][this.nextTable] = [childrenEntity];
             this.refreshChildTables();
         }
         else {
-            if (this.childInfiniteTable) this.childInfiniteTable.addNewChildrenElement(raiz, elementoNuevo);
+            if (this.childInfiniteTable) this.childInfiniteTable.addNewChildrenElement(rootEntity, childrenEntity);
         }
     }
 
     /**
-     * Lógica de selección de un elemento
+     * Get the last instance of the tables that is open
      *
-     * @param elemento Elemento a seleccionar
-     * @param forzado Si está a true, fuerza la ejecución de la lógica de selección aunque ya estuviera
+     * @returns The last table
      */
-    select(elemento: any, forzado?: boolean): void {
+    public getLastTable(): GTInfiniteTableComponent | GTTableComponent {
+        if (this.childTable) return this.childTable
+        else if (this.childInfiniteTable) return this.childInfiniteTable.getLastTable();
+        else return this;
+    }
+
+    /**
+     * Logic of selection an entity
+     *
+     * @param entity Entity to select
+     * @param force Even if it was selected, forces the code
+     */
+    public select(entity: any, force?: boolean): void {
         if (this.selectable) {
-            if (this.expansionRequest && (!this.coldReload || !elemento[this.nextTable])) {
-                if (this.selectedElement === elemento && !forzado) {
+            if (this.expansionRequest && (!this.coldReload || !entity[this.nextTable])) {
+                if (this.selectedElement === entity && !force) {
                     this.selectedElement = null;
-                    this.sendNotification({ accion: 'configurar', elemento: this.selectedElement });
+                    this.sendNotification({ action: 'configurar', entity: this.selectedElement });
                 } else {
                     // Lógica de expansión asincrona
-                    const valoresPeticion: any[] = this.expansionRequest.prepareParams(elemento);
+                    const valoresPeticion: any[] = this.expansionRequest.prepareParams(entity);
                     try {
                         this.expansionRequest.request(...valoresPeticion).subscribe(result => {
-                            this.selectedElement = elemento;
-                            elemento[this.nextTable] = result;
-                            this.sendNotification({ accion: 'configurar', elemento: this.selectedElement });
+                            this.selectedElement = entity;
+                            entity[this.nextTable] = result;
+                            this.sendNotification({ action: 'configurar', entity: this.selectedElement });
                             this.childrenLoaded.subscribe(tabla => {
                                 if (tabla !== 0) this.childTable = tabla;
                                 this.childLoaded.emit(this.childTable);
@@ -237,15 +225,46 @@ export class GTInfiniteTableComponent extends GTTableBase implements OnInit, Aft
 
                 }
             } else {
-                this.selectedElement = this.selectedElement === elemento ? null : elemento;
-                this.childrenLoaded.subscribe(tabla => {
-                    this.sendNotification({ accion: 'configurar', elemento: this.selectedElement });
-                    if (this.coldReload) this.childTable = tabla;
-                    this.childLoaded.emit(this.childTable);
-                })
+                this.selectedElement = this.selectedElement === entity ? null : entity;
+                console.log('quien?')
+                this.sendNotification({ action: 'select', entity: this.selectedElement });
             }
         }
     }
+
+
+        /**
+     * Evento de notificación de cuando se ha realizado una acción
+     *
+     * @param entity entity sobre el cual se va a realizar la acción
+     * @param accion Acción a realizar y devolver
+     */
+        protected doAction(entity: any, action: string): void {
+            if (action === 'autoDelete') {
+                this.notify.emit({ action, entity });
+            } else {
+                switch (action) {
+                    case 'autoDelete':
+                        this.sharedService.showConfirmation(this.prepareMessage(entity, this.model[0], this.visual[0])).subscribe(accept => {
+                            if (accept) {
+                                this.deleteElement(entity)
+                                this.sendNotification({ action, entity });
+                            }
+                        });
+                        break;
+                    case 'eliminar':
+                        this.sharedService.showConfirmation(this.prepareMessage(entity, this.model[0], this.visual[0])).subscribe(accept => {
+                            if (accept) {
+                                this.sendNotification({ action, entity });
+                            }
+                        });
+                        break;
+                    default:
+                        this.sendNotification({ action, entity });
+                }
+            }
+            if (this.overlayRef) this.close();
+        }
 
 
     /**
@@ -254,13 +273,13 @@ export class GTInfiniteTableComponent extends GTTableBase implements OnInit, Aft
      * @param event Información a enviar
      * @param nivel Si procede de una tabla hija
      */
-    sendNotification(event: { accion: string, elemento: any }, nivel?: string, isExpansion?: boolean): void {
+    protected sendNotification(event: { action: string, entity: any }, nivel?: string, isExpansion?: boolean): void {
         const envio: object = Object.assign({}, event);
-        envio['raiz'] = nivel ? this.selectedElement : event.elemento;
-        if (nivel) envio[nivel] = event.elemento;
-        if (isExpansion) envio[nivel as string] = event['raiz'];
-        /** Si es una tabla de recursión infinita, dejamos el atributo elemento para no perderlo */
-        if (!this.inheritance) delete envio['elemento'];
+        envio['root'] = nivel ? this.selectedElement : event.entity;
+        if (nivel) envio[nivel] = event.entity;
+        if (isExpansion) envio[nivel as string] = event['root'];
+        /** Si es una tabla de recursión infinita, dejamos el atributo entity para no perderlo */
+        if (!this.inheritance) delete envio['entity'];
         this.notify.emit(envio);
     }
 
@@ -270,19 +289,19 @@ export class GTInfiniteTableComponent extends GTTableBase implements OnInit, Aft
      * @param event Información a enviar
      * @param nivel nivel de anidación
      * @param isExpansion Si es expansión
-     * @param elementoPadre elementoPadre del que parte la tabla
+     * @param entityPadre entityPadre del que parte la tabla
      */
-    notifyChildTable(event: { accion: string, elemento: any }, nivel: string, isExpansion: boolean, elementoPadre: any): void {
+    protected notifyChildTable(event: { action: string, entity: any }, nivel: string, isExpansion: boolean, entityPadre: any): void {
         if (this.checkboxMode) {
-            if (event.accion === 'marcados' || event.accion === 'desmarcados') {
-                const evento = { accion: event.accion, raiz: elementoPadre };
-                evento[this.nextTable] = event.elemento;
+            if (event.action === 'marcados' || event.action === 'desmarcados') {
+                const evento = { action: event.action, root: entityPadre };
+                evento[this.nextTable] = event.entity;
                 this.notify.emit(evento);
-                const marcadosHijos: any[] = elementoPadre[this.nextTable].filter(dato => dato.tSeleccionado === true);
-                elementoPadre.tSeleccionado = marcadosHijos.length === elementoPadre[this.nextTable].length;
-                elementoPadre.tIndeterminate = marcadosHijos.length > 0 && elementoPadre.tSeleccionado === false;
+                const marcadosHijos: any[] = entityPadre[this.nextTable].filter(dato => dato.tSeleccionado === true);
+                entityPadre.tSeleccionado = marcadosHijos.length === entityPadre[this.nextTable].length;
+                entityPadre.tIndeterminate = marcadosHijos.length > 0 && entityPadre.tSeleccionado === false;
             } else {
-                const dataToShowHijos: any[] = elementoPadre[this.nextTable] ?? [];
+                const dataToShowHijos: any[] = entityPadre[this.nextTable] ?? [];
                 const marcadosHijos: any[] = dataToShowHijos.filter(dato => dato.tSeleccionado === true);
                 if (this.selectedElement) {
                     this.selectedElement.tSeleccionado = marcadosHijos.length === dataToShowHijos.length;
@@ -299,21 +318,12 @@ export class GTInfiniteTableComponent extends GTTableBase implements OnInit, Aft
 
     }
 
-    /**
-     * Obtiene la ultima tabla que esté abierta
-     *
-     * @returns La instancia de la última tabla
-     */
-    obtenUltimaTabla(): GTInfiniteTableComponent | GTTableComponent {
-        if (this.childTable) return this.childTable
-        else if (this.childInfiniteTable) return this.childInfiniteTable.obtenUltimaTabla();
-        else return this;
-    }
+
 
     /** Recorre todas las casillas buscando los marcados, de ahí filtra los que tienen hijos
      * y si los hijos no tienen todos marcados, cambía el estado a indeterminate
      */
-    refrescaCasillas(): void {
+    protected refrescaCasillas(): void {
         const marcados: any[] = this.dataToShow.filter(dato => dato.tSeleccionado === true);
         this.casillaMaestra.all = marcados.length === this.dataToShow.length;
         this.casillaMaestra.indeterminate = !this.casillaMaestra.all ? marcados.length > 0 : false;
@@ -325,7 +335,7 @@ export class GTInfiniteTableComponent extends GTTableBase implements OnInit, Aft
      *
      * @param event Evento del checkbox
      */
-    clickTodasCasillas(event: MatCheckboxChange): void {
+    protected clickTodasCasillas(event: MatCheckboxChange): void {
         this.dataToShow.forEach(dato => {
             if (event.checked !== dato.tSeleccionado) this.clickCasilla(dato, event)
         });
@@ -334,34 +344,34 @@ export class GTInfiniteTableComponent extends GTTableBase implements OnInit, Aft
 
     }
     /**
-     * Recoge la acción de clicado de una casilla, asigna el nuevo valor al elemento, y si todas
+     * Recoge la acción de clicado de una casilla, asigna el nuevo valor al entity, y si todas
      * estan marcadas, marca la casilla maestra
      *
-     * @param elemento Elemento clicado
+     * @param entity entity clicado
      * @param event Evento del checkbox
      */
-    clickCasilla(elemento: any, event: MatCheckboxChange): void {
+    protected clickCasilla(entity: any, event: MatCheckboxChange): void {
         const accion: string = event.checked ? 'marcado' : 'desmarcado';
-        elemento.tSeleccionado = event.checked;
+        entity.tSeleccionado = event.checked;
         const marcados: any[] = this.dataToShow.filter(dato => dato.tSeleccionado === true);
         this.casillaMaestra.all = marcados.length === this.dataToShow.length;
         this.casillaMaestra.indeterminate = !this.casillaMaestra.all ? marcados.length > 0 : false;
 
-        if (!elemento[this.nextTable]?.length) {
-            this.notify.emit({ raiz: elemento, accion });
+        if (!entity[this.nextTable]?.length) {
+            this.notify.emit({ root: entity, accion });
         } else {
             const agrupacionEventos: any[] = [];
-            elemento[this.nextTable].forEach(dato => {
+            entity[this.nextTable].forEach(dato => {
                 // Si ya estaba marcado o desmarcado el hijo, no añado su valor
                 if (dato.tSeleccionado !== event.checked) {
                     dato.tSeleccionado = event.checked;
                     agrupacionEventos.push(dato);
                 }
             });
-            const evento = { accion: accion + 's', raiz: elemento };
+            const evento = { action: accion + 's', root: entity };
             evento[this.nextTable] = agrupacionEventos;
-            const marcadosHijos = elemento[this.nextTable].filter(dato => dato.tSeleccionado === true);
-            elemento.tIndeterminate = marcadosHijos > 0 && marcadosHijos < elemento[this.nextTable].length;
+            const marcadosHijos = entity[this.nextTable].filter(dato => dato.tSeleccionado === true);
+            entity.tIndeterminate = marcadosHijos > 0 && marcadosHijos < entity[this.nextTable].length;
             this.notify.emit(evento);
 
             // Si tiene childTable actualmente abierta, actualizo su casilla maestra

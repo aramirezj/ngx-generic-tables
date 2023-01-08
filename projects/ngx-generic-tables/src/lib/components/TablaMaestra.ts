@@ -160,7 +160,7 @@ export abstract class GTTableBase {
         this.restartPagination();
         if (this.selectedElement) {
             this.selectedElement = null;
-            this.notify.emit({ accion: 'select', elemento: null });
+            this.notify.emit({ action: 'select', elemento: null });
         }
     }
 
@@ -171,7 +171,7 @@ export abstract class GTTableBase {
      * @param oldElement Old element to replace
      * @param newElement New element to be added
      */
-    replaceElement(oldElement: any, newElement: any): void {
+    public replaceElement(oldElement: any, newElement: any): void {
         const index: number = this.data.indexOf(oldElement);
         if (index !== -1) {
             this.data[index] = newElement;
@@ -185,7 +185,7 @@ export abstract class GTTableBase {
      * Logic to add a new element to the table, if this table has primary key, will try to restrict it
      * @param element Element to add
      */
-    addNewElement(element: any): void {
+    public addNewElement(element: any): void {
         if (this.primaryKey) {
             if (!this.sharedService.findRepeatRecursivo(this.data.slice(), this.primaryKey, element)) {
                 this.add(element);
@@ -212,7 +212,7 @@ export abstract class GTTableBase {
      *
      * @param element Element to delete
      */
-    deleteElement(element: any): void {
+    public deleteElement(element: any): void {
         const result = this.dataToShow.splice(this.dataToShow.indexOf(element), 1);
         if (result) {
             this.data.splice(this.data.indexOf(element), 1);
@@ -226,17 +226,17 @@ export abstract class GTTableBase {
     }
 
     /** Check again all the conditions of the actions */
-    checkConditions(): void {
+    public checkConditions(): void {
         if (this.actions) {
             this.actions.forEach(action => { if (action.conditionObserver) action.conditionObserver.next(1) });
         }
     }
 
 
-    /** Función para ejecutar desde componentes padres para emitir una deselección */
-    deselect(): void {
+    /** Deselect an element and send the notification */
+    public deselect(): void {
         this.selectedElement = null;
-        this.notify.emit({ accion: 'select', elemento: this.selectedElement });
+        this.notify.emit({ action: 'select', elemento: this.selectedElement });
     }
 
     /**
@@ -246,7 +246,7 @@ export abstract class GTTableBase {
      * @param value Value of that field in the element
      * @returns Element
      */
-    getElement(field: string, value: any): any {
+    public getElement(field: string, value: any): any {
         const elemento: any = this.dataToShow.find(dato => dato[field] === value);
         if (elemento) return elemento;
         else this.sharedService.openSnackBar('The element to get was not found', 3);
@@ -280,7 +280,6 @@ export abstract class GTTableBase {
         //Si no se ha detectado el tamaño de la tabla por la razón que sea, la seteamos a 5000 para que tenga de sobra
         this.tamanioInicial = anchuraTabla;
         let iTotal: number = 0;
-        console.log(this)
         let numeroColumnas = this.model.length;
         if (this.actions || (!this.fxFlexes)) numeroColumnas += 0.5;
         const widthBase: number = 100 / numeroColumnas;

@@ -4,7 +4,7 @@ import { GT_Action } from '../../classes/Accion';
 import { GT_ConditionAction, GT_ConditionLogic, GT_ConditionType } from '../../classes/ConditionAction';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgIf } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 /** Componente encargado de la lógica de acciones con condiciones */
 @Component({
@@ -12,7 +12,7 @@ import { MatButtonModule } from '@angular/material/button';
     templateUrl: './table-action.component.html',
     styleUrls: ['./table-action.component.scss'],
     standalone:true,
-    imports:[CommonModule,MatIconModule,MatTooltipModule, MatButtonModule]
+    imports:[NgIf,MatIconModule,MatTooltipModule, MatButtonModule]
 })
 
 export class GTTableActionComponent implements OnInit {

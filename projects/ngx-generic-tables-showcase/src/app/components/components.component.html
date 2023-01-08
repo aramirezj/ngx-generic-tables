@@ -4,92 +4,272 @@
 <p>Import the desired component in section of imports of the module you want to use</p>
 
 
-<h2 id="development-server">GFConfirmationComponent:</h2>
-<p>Is a control component that shows some chips button for allowing the user to select Yes or No</p>
+<h2 id="development-server">GTTableComponent:</h2>
+<p>Is a component to display a list of information, being able to filter it, sort it, paginate it, giving it actions and
+    handle the actions for each entity and more options</p>
 
 <h2 id="development-server">Example working:</h2>
-<!--<gf-confirmation description="Do you like this library?"></gf-confirmation>-->
+<gt-table [data]="products" [model]="tModel" [visual]="tVisual" [search]="true" [catalogActions]="tAction" (notify)="handleActions($event)"></gt-table>
 <h2>Example of code:</h2>
 <pre>
 <code class="language-html">
-&#60;gf-confirmation formControlName="question" description="Do you like this library?"&#62;&#60;/gf-confirmation&#62;
+&#60;gt-table [data]="products" [model]="tModel" [visual]="tVisual" [search]="true" [catalogActions]="tAction" (notify)="handleActions($event)">&#60;/gt-table>
+</code>
+</pre>
+<pre>
+<code class="language-js">
+products: Product[] = [
+    &#123; id: 1, name: 'Leather Sofa', price: '$999.99', type: &#123;id:1, name:'Inhouse furniture'} },
+    &#123; id: 2, name: 'Coffee Table', price: '$149.99',type: &#123;id:1, name:'Inhouse furniture'} },
+    &#123; id: 3, name: 'Dining Table', price: '$399.99',type: &#123;id:1, name:'Inhouse furniture'} },
+    &#123; id: 4, name: 'Bedroom Set', price: '$799.99',type: &#123;id:2, name:'Outhouse furniture'} },
+    &#123; id: 5, name: 'Loveseat', price: '$449.99',type: &#123;id:1, name:'Inhouse furniture'} },
+    &#123; id: 6, name: 'Rug', price: '$99.99',type: &#123;id:1, name:'Inhouse furniture'} },
+    &#123; id: 7, name: 'Floor Lamp', price: '$69.99',type: &#123;id:2, name:'Outhouse furniture'} }
+  ];
+  tModel: string[] = ['id', 'name', 'price', 'type.name'];
+  tVisual: string[] = ['Id.', 'Name', 'Price', 'Type'];
+  tAction: string[] = ['edit', 'autoDelete'];
+
+  handleActions(event: &#123; action: string, entity: Product }) &#123;
+    switch(event.action)&#123;
+      case 'autoDelete':
+        //Your code for the delete api
+        break;
+      case 'edit':
+        //Your code for opening a edit form and then the api
+        break;
+    }
+  }
 </code>
 </pre>
 
-<h4>Inputs parameters:</h4>
+<h4>Input/Output parameters:</h4>
 <pre>
     <code class="language-js">
-/** Description of the control */
-@Input() description: string | undefined;
+        /**Attribute with the collection of data to show*/
+        @Input() data: any[] = [];
+        /**Columns to display in the table*/
+        @Input() visual: string[] = [];
+        /**Columns of the model of the collection that is received*/
+        @Input() model: string[] = [];
+        /**Actions that should be available*/
+        @Input() catalogActions!: string[];
+        /**List of actions with conditions*/
+        @Input() actions!: GT_Action[];
+        /**Enables or disables the search of the table*/
+        @Input() search: boolean = false;
+        /**Primary key that the table will have. It will be used in insertions by method and edition*/
+        @Input() primaryKey: string | null = null;
+        /**Allows you to click on the table to select an element and send it*/
+        @Input() selectable: boolean = false;
+        /**Control of pagination*/
+        @Input() paginator: boolean = true;
+        /**Receives an element to be preselected and send the event when the table is loaded. It is searched by its primaryKey*/
+        @Input() preselectedElement: &#123; data: any, primaryKey: string } | null = null;
+        /**In the case of being a child table, it will emit a value when loaded*/
+        @Input() subjectLoaded: BehaviorSubject&#60;any> | null = null;
+        /**Mode to activate the checkbox mode of the table. With checkbox*/
+        @Input() checkboxMode: boolean = false;
+        /**Mode to activate the compression of actions in a menu*/
+        @Input() actionMenu: boolean = false;
+        /**Forces some sizes to the table, depending on the number of columns it has. It is used as a [fxFlex]*/
+        @Input() fxFlexes: number[] | null = null;
+        /** Element to notify the component that invokes the table */
+        @Output() notify: EventEmitter&#60;any> = new EventEmitter&#60;any>();
+        /** Element to notify the component that invokes the table */
+        @Output() sorted: EventEmitter&#60;Sort> = new EventEmitter&#60;Sort>();
     </code>
 </pre>
 
-<h2 id="development-server">GFMasterSelectComponent:</h2>
-<p>Is a control component that shows a select based control with a filter, and alowing different things like, pass an
-    observable and allow the component
-    to retrieve the information, list an array of objects, telling the component the property(label) that will be used
-    to show information about the object
-    and also if the value to retrieve when you choose an option, should be the whole object or just a property of it
+<h4>Methods:</h4>
+<pre>
+    <code class="language-js">
+    /**
+    * Logic to add a new element to the table, if this table has primary key, will try to restrict it
+    * @param element Element to add
+    */
+    public addNewElement(element: any): void
+
+    /**
+     * Replace two elements.
+     * 
+     *
+     * @param oldElement Old element to replace
+     * @param newElement New element to be added
+     */
+    public replaceElement(oldElement: any, newElement: any): void
+
+    /**
+     * Deletes an element from the table
+     *
+     * @param element Element to delete
+     */
+    public deleteElement(element: any): void
+
+    /**
+     * Forces a refresh of the data showed in the table
+     *
+     * @param data New data
+     * @param blockPage If true, it will not send a pagination event
+     */
+    public refreshData(data: any[], blockPage?: boolean): void
+
+    /** Check again all the conditions of the actions */
+    public checkConditions(): void
+
+    /**
+     * Selects an element. If the property its pass, it will try to find it, and if preSelect is true, it will set the value of the first model to the searcher
+     *
+     * @param element Element to select
+     * @param property Property to filter
+     * @param preSelect If true, will write in the searcher the model
+     */
+    public select(element: any, property?: string, preSelect?: boolean): void 
+
+    /** Deselect an element and send the notification */
+    public deselect(): void
+
+    /**
+     * Get an element from the table
+     *
+     * @param field Field to filter
+     * @param value Value of that field in the element
+     * @returns Element
+     */
+    public getElement(field: string, value: any): any
+    </code>
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- INFINITE-->
+<h2 id="development-server">GTInfiniteTableComponent:</h2>
+<p>Like the previous one, but with the capace of nestig infinites tables, if for example you have a list of type of products, that each of them has a list of product,
+    you can nest it using this table. The source of the list of products could be or locally using only the attribute or it can receive an GT_APIRequest so it can
+    ask for the data when its required
 </p>
 
 <h2 id="development-server">Example working:</h2>
-
-<form [formGroup]="form">
-   <!-- <gf-master-select [data]="products" label="name" secondLabel="price" placeholder="Select one product" model="id"
-        formControlName="product"></gf-master-select>
-    <p>The id of the selected product is {{form.value.product}}</p>-->
-</form>
-
+<gt-infinite-table [data]="typesProduct" [models]="tModelTypes" [visuals]="tVisualTypes" [search]="true" [levels]="levels" [catalogActionsLevels]="tActionsLevels" (notify)="handleActions($event)"></gt-infinite-table>
 <h2>Example of code:</h2>
 <pre>
-    <code class="language-js">
-    //Your component
-    form:FormGroup = new FormGroup(&#123;product:new FormControl()})
-    products: Product[] = [
-        &#123; id: 1, name: 'Leather Sofa', price: '$999.99' },
-        &#123; id: 2, name: 'Coffee Table', price: '$149.99' },
-        &#123; id: 3, name: 'Dining Table', price: '$399.99' },
-        &#123; id: 4, name: 'Bedroom Set', price: '$799.99' },
-        &#123; id: 5, name: 'Loveseat', price: '$449.99' },
-        &#123; id: 6, name: 'Rug', price: '$99.99' },
-        &#123; id: 7, name: 'Floor Lamp', price: '$69.99' },
-        &#123; id: 8, name: 'Bookcase', price: '$199.99' },
-        &#123; id: 9, name: 'Accent Chair', price: '$129.99' },
-        &#123; id: 10, name: 'Outdoor Patio Set', price: '$799.99' }
-    ];
-    </code>
 <code class="language-html">
-    &#60;!-- Your template-->
-    &#60;form [formGroup]="form">
-        &#60;gf-master-select [data]="products" label="name" model="id" formControlName="product" secondLabel="price"
-     placeholder="Select one product"&#62;&#60;/gf-master-select&#62;
-    &#60;/form>
+    &#60;gt-infinite-table [data]="typesProduct" [models]="tModelTypes" [visuals]="tVisualTypes" [search]="true" [levels]="levels" [catalogActionsLevels]="tActionsLevels" (notify)="handleActions($event)">    &#60;gt-infinite-table [data]="typesProduct" [models]="tModelTypes" [visuals]="tVisualTypes" [search]="true" [levels]="levels" [catalogActionsLevels]="tActionsLevels" (notify)="handleActions($event)">&#60;/gt-infinite-table>
 </code>
+</pre>
+<pre>
+<code class="language-js">
+    inhouseProducts:Product[] = [
+    &#123; id: 1, name: 'Leather Sofa', price: '$999.99', type: &#123; id: 1, name: 'Inhouse furniture' } },
+    &#123; id: 2, name: 'Coffee Table', price: '$149.99', type: &#123; id: 1, name: 'Inhouse furniture' } },
+    &#123; id: 3, name: 'Dining Table', price: '$399.99', type: &#123; id: 1, name: 'Inhouse furniture' } },
+    &#123; id: 5, name: 'Loveseat', price: '$449.99', type: &#123; id: 1, name: 'Inhouse furniture' } },
+    &#123; id: 6, name: 'Rug', price: '$99.99', type: &#123; id: 1, name: 'Inhouse furniture' } }
+  ]
 
+  outhouseProducts:Product[] = [
+    &#123; id: 4, name: 'Bedroom Set', price: '$799.99', type: &#123; id: 2, name: 'Outhouse furniture' } },
+    &#123; id: 7, name: 'Floor Lamp', price: '$69.99', type: &#123; id: 2, name: 'Outhouse furniture' } }
+  ]
+
+  typesProduct:TypeProduct[] = [
+    &#123;id:1,name:'Inhouse furniture',products:this.inhouseProducts},
+    &#123;id:2,name:'Outhouse furniture',products:this.outhouseProducts},
+
+  ]
+
+  handleActionsTypes(event:&#123;action:string,root:TypeProduct, products?:Product})&#123;
+    switch(event.action)&#123;
+      case 'autoDelete':
+        //Your code for the delete api
+        break;
+      case 'edit':
+        //Your code for opening a edit form and then the api
+        break;
+    }
+  }
+</code>
 </pre>
 
-<h4>Inputs parameters:</h4>
+<h4>Input/Output parameters: (Has the same of GTTableComponent but with extras to handle the levels of nesting) </h4>
 <pre>
     <code class="language-js">
-/** Source data */
-@Input() data: any[] | Observable&#60;any> = [];
-/** If the source data are objects, and this is setted, it will retrieve the property of the object. If not, the select will retrieve the whole object */
-@Input() model: string | undefined;
-/** If the source data are objects, it will be neccesary to get the property that is gonna be used to display information */
-@Input() label: string | undefined;
-/** If the source data are objects, it can be used to get a second property that is gonna be used to display information */
-@Input() secondLabel: string | undefined;
-/** Placeholder that will be displayed */
-@Input() placeholder: string | undefined;
-/** Extra information   */
-@Input() hint: string = '';
-/** To control if the input search should be displayed or not */
-@Input() searcher: boolean = true;
-/** To control if the select can accept multiple choices */
-@Input() multiple: boolean = false;
-/** To give a custom function search. The params in the function has to be (term: string, item: any) */
-@Input() customSearch: any;
-/** If the source data are objects, it can be used to specify a primary key so it can compare the item faster */
-@Input() key: string | undefined;
+        /** Actions with conditions */
+        @Input() actionLevels!: GT_Action[][];
+        /** Actions that will be added to the child tables */
+        @Input() catalogActionsLevels!: Array&#60;string[]>;
+        /** Columns to show in the table*/
+        @Input() visuals!: string[][];
+        /** Model columns of the collection being received*/
+        @Input() models!: string[][];
+        /** Collection to know the names of the attributes from which to extract the nesting*/
+        @Input() levels!: string[];
+        /** Collection to know the titles of the next tables*/
+        @Input() levelTitles: string[] = [];
+        /** Request that will be executed when expanding the table*/
+        @Input() expansionRequest!: GT_APIRequest;
+        /** Attribute to keep track of which step of the nesting we are in, starts at 0*/
+        @Input() nestingIndex: number = 0;
+        /** Collection of expansion requests to nest*/
+        @Input() infiniteRequests!: GT_APIRequest[];
+        /** Flag that will indicate if the children will always be the same as the parent*/
+        @Input() inheritance!: boolean;
+        /** If activated, the expansion request will only be loaded the first time it is opened, it is intended to save the contents in block*/
+        @Input() coldReload: boolean = false;
+        /** To indicate the fxFlex levels of the infinite table*/
+        @Input() levelFxFlexes!: number[][];
+    </code>
+</pre>
+
+<h4>Methods:</h4>
+<pre>
+    <code class="language-js">
+    /**
+    * Updates the data of the table and also the child tables
+    *
+    * @param data New data to show
+    */
+    public refreshData(data: any): void 
+
+    /** Refresh the data of the child tables */
+    public refreshChildTables(): void
+
+    /**
+     * Insert a new children entity to an especific entity
+     *
+     * @param rootEntity entity root
+     * @param childrenEntity children entity to add
+     */
+    public addNewChildrenElement(rootEntity: any, childrenEntity: any): void
+
+    /**
+     * Get the last instance of the tables that is open
+     *
+     * @returns The last table
+     */
+    public getLastTable(): GTInfiniteTableComponent | GTTableComponent
+
+    /**
+     * Logic of selection an entity
+     *
+     * @param entity Entity to select
+     * @param force Even if it was selected, forces the code
+     */
+    public select(entity: any, force?: boolean): void
+
+  
     </code>
 </pre>

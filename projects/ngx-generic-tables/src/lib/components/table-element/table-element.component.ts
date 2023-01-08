@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import {  DatePipe, DecimalPipe, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
 import { Component, OnInit, Input, SimpleChange } from '@angular/core';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
 
@@ -9,7 +9,7 @@ import { coerceBooleanProperty } from '@angular/cdk/coercion';
   templateUrl: './table-element.component.html',
   styleUrls: ['./table-element.component.scss'],
   standalone: true,
-  imports: [CommonModule]
+  imports: [NgSwitch, NgSwitchCase,NgSwitchDefault, DecimalPipe, DatePipe]
 })
 export class GTTableElementComponent implements OnInit {
   /** Elemento a tratar */

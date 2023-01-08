@@ -1,7 +1,6 @@
 import { EventEmitter, inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { formatDate } from '@angular/common';
-import { Router } from '@angular/router';
 import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 import { Dialog, DialogConfig } from '@angular/cdk/dialog';
 import { ComponentType } from '@angular/cdk/portal';
@@ -34,10 +33,10 @@ export class SharedService {
     * @param options
     * @returns Observable del dialogo
     */
-    showConfirmation(message: string, options?: string[]): Observable<any> {
+    showConfirmation(message: string): Observable<any> {
         const dialogRef = this.ckDialog.open(GTConfirmationComponent, {
             width: '30vw',
-            data: { message, options }
+            data: { message }
         })
         return dialogRef.closed;
     }

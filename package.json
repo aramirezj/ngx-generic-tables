@@ -1,12 +1,12 @@
 {
   "name": "@aramirezj/ngx-generic-tables",
-  "version": "0.9.0",
+  "version": "1.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve -o",
     "build": "npm run build:library && npm run build:showcase && del-cli --force ./dist/ngx-generic-tables/fesm2015",
-    "build:library": "ng build --project=ngxGenericForm && npm run copy-readme",
-    "build:showcase": "ng build --project=ngxGenericFormShowcase --base-href ./",
+    "build:library": "ng build --project=ngx-generic-tables && npm run copy-readme",
+    "build:showcase": "ng build --project=ngx-generic-tables-showcase --base-href ./",
     "bump-version": "rjp package.json version $VERSION",
     "copy-readme": "copyfiles README.md dist/ngx-generic-tables",
     "copy-docs": "copyfiles dist/ngx-generic-tables-showcase/ docs/",

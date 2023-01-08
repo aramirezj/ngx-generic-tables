@@ -3,12 +3,12 @@ import { GT_ConditionAction } from './ConditionAction';
 
 /** Class used in the tables for the actions */
 export class GT_Action {
-    /** Catálogo de acciones predefinidas con su descripción e icono */
-    static catalog: object =
+    /** Catalog of predefined actions for the tables */
+    public static catalog: object =
         {
             delete: { description: 'Delete element', icon: 'clear' },
-            deleteAuto: { description: 'Delete element', icon: 'clear' },
-            edit: { description: 'Edit elemento', icon: 'edit' },
+            autoDelete: { description: 'Delete element', icon: 'clear' },
+            edit: { description: 'Edit element', icon: 'edit' },
             inspect: { description: 'Inspect element', icon: 'remove_red_eye' },
             search: { description: 'Search element', icon: 'search' },
             emptySpot: { description: '', icon: '' },
@@ -37,12 +37,12 @@ export class GT_Action {
      * Add a list of conditions to a list of actions
      *
      * @param conditions Condition to bind
-     * @param acciones Actions that will receive the conditions
+     * @param actions Actions that will receive the conditions
      */
-    static addConditionToActions(conditions: GT_ConditionAction[], acciones: GT_Action[]): void {
+    static addConditionToActions(conditions: GT_ConditionAction[], actions: GT_Action[]): void {
         conditions.forEach(condicion => {
             const behaviour = new BehaviorSubject(0);
-            acciones.forEach(accion => {
+            actions.forEach(accion => {
                 accion.conditionObserver = accion.conditionObserver ?? behaviour;
                 accion.conditions = accion.conditions ?? [];
                 accion.conditions.push(condicion);

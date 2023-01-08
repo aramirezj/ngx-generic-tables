@@ -1,5 +1,5 @@
 <!-- Busqueda -->
-<gt-searcher *ngIf="search" (notify)="toSearch($event)"> </gt-searcher>
+<gt-searcher *ngIf="search" (toSearch)="toSearch($event)"> </gt-searcher>
 <!-- Tabla en sí-->
 <div class="tablaMaterial" [id]="idTabla">
     <!-- Encabezado de la tabla -->
@@ -19,7 +19,7 @@
 
         <!--Encabezado de las acciones -->
         <div [class]="'elementoEncabezado elementosAcciones '+idTabla+'-columna-acciones'">
-            <span>Acciones</span>
+            <span>{{'ACTIONS' | translate}}</span>
         </div>
 
 
@@ -118,7 +118,7 @@
 
         <em class="material-icons iconExpandir" *ngIf="!expansionRequest ?
         elemento[nextTable]?.length : true"
-            [matTooltip]="selectedElement === elemento ? 'Contraer elemento': 'Expandir elemento'"
+            [matTooltip]="selectedElement === elemento ? 'Contraer elemento': 'EXPAND' | translate"
             matTooltipPosition="above">{{selectedElement === elemento ? 'remove_circle' : 'add_box'}}</em>
 
         <em class="material-icons iconExpandir hiddenIcon" matTooltipPosition="above"></em>
@@ -137,8 +137,8 @@
             <gt-table *ngIf="!nextTableInfinite" [data]="elemento[nextTable]" [visual]="visuals[nestingIndex]"
                 [model]="models[nestingIndex]" [paginator]="false"
                 [fxFlexes]="levelFxFlexes ? levelFxFlexes[nestingIndex] : null"
-                [conditionalActions]="actionLevels ? actionLevels[nestingIndex] : null"
                 [actions]="actionLevels ? actionLevels[nestingIndex] : null" 
+                [catalogActions]="catalogActionsLevels ? catalogActionsLevels[nestingIndex] : []" 
                 [checkboxMode]="checkboxMode"
                  [subjectLoaded]="childrenLoaded"
                 (notify)="notifyChildTable($event, nextTable,false,elemento)">

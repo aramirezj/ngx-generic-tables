@@ -1,8 +1,11 @@
+import { NgIf } from '@angular/common';
 import { Component, EventEmitter, Output } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { GTTranslatePipe } from '../../directives/translate.directive';
 
 
 /** Componente encargado de mostrar un formulario de busqueda */
@@ -11,7 +14,7 @@ import { MatInputModule } from '@angular/material/input';
   templateUrl: './searcher.component.html',
   styleUrls: ['./searcher.component.scss'],
   standalone: true,
-  imports: [MatFormFieldModule, MatInputModule, MatIconModule, ReactiveFormsModule]
+  imports: [MatFormFieldModule, MatInputModule, MatIconModule, ReactiveFormsModule,MatButtonModule, NgIf, GTTranslatePipe]
 })
 export class GTSearcherComponent {
   /** Notification with what the user wrote */

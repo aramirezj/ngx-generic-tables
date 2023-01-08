@@ -1,4 +1,4 @@
-<gt-searcher *ngIf="search" (notify)="toSearch($event)"></gt-searcher>
+<gt-searcher *ngIf="search" (toSearch)="toSearch($event)"></gt-searcher>
 
 <div [id]="idTabla" class="tablaMaterial">
     <!-- Encabezado de la tabla -->
@@ -20,7 +20,7 @@
 
         <!--Encabezado de las acciones -->
         <div *ngIf="actions?.length" [class]="'elementoEncabezado elementosAcciones '+idTabla+'-columna-acciones'">
-            <span>Acciones</span>
+            <span>{{'ACTIONS' | translate}}</span>
         </div>
 
 

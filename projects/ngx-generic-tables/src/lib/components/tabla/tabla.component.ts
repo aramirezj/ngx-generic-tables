@@ -1,5 +1,5 @@
 import { Overlay } from '@angular/cdk/overlay';
-import { CommonModule } from '@angular/common';
+import { NgFor, NgIf, NgSwitch, NgSwitchCase, NgTemplateOutlet } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, OnInit, Renderer2, ViewContainerRef } from '@angular/core';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { MatPaginatorModule } from '@angular/material/paginator';
@@ -10,6 +10,9 @@ import { GTTableBase } from '../TablaMaestra';
 import { GTTableActionComponent } from '../table-action/table-action.component';
 import { GTTableElementComponent } from '../table-element/table-element.component';
 import { MatMenuModule } from '@angular/material/menu';
+import { DialogModule } from '@angular/cdk/dialog';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { GTTranslatePipe } from '../../directives/translate.directive';
 /** Componente de la Tabla encargada del listado y tratado de elementos */
 @Component({
     selector: 'gt-table',
@@ -17,7 +20,7 @@ import { MatMenuModule } from '@angular/material/menu';
     styleUrls: ['./tabla.component.scss'],
     inputs: GTTableBase.commonInputs,
     standalone: true,
-    imports: [CommonModule, GTSearcherComponent, GTTableElementComponent, GTTableActionComponent, MatCheckboxModule, MatPaginatorModule, MatMenuModule]
+    imports: [NgIf, NgFor, NgSwitch, NgSwitchCase, NgTemplateOutlet,GTTranslatePipe, GTSearcherComponent, GTTableElementComponent, GTTableActionComponent, MatCheckboxModule, MatPaginatorModule, MatMenuModule, DialogModule, MatSnackBarModule]
 })
 export class GTTableComponent extends GTTableBase implements OnInit, AfterViewInit {
     /** Referencia a la propia tabla */
@@ -84,33 +87,32 @@ export class GTTableComponent extends GTTableBase implements OnInit, AfterViewIn
     /**
      * Evento de notificación de cuando se ha realizado una acción
      *
-     * @param elemento Elemento sobre el cual se va a realizar la acción
+     * @param entity entity sobre el cual se va a realizar la acción
      * @param accion Acción a realizar y devolver
      */
-    protected doAction(elemento: any, accion: string): void {
-        if (accion === 'deleteAuto') {
-            this.notify.emit({ accion, elemento });
-        } else {
-            switch (accion) {
-                case 'eliminarT':
-                    this.sharedService.showConfirmation(this.prepareMessage(elemento, this.model[0], this.visual[0])).subscribe(accept => {
-                        if (accept) {
-                            this.data.splice(this.data.indexOf(elemento), 1);
-                            this.dataToShow.splice(this.dataToShow.indexOf(elemento), 1);
-                            this.notify.emit({ accion, elemento });
-                        }
-                    });
-                    break;
-                case 'eliminar':
-                    console.log(this.prepareMessage(elemento, this.model[0], this.visual[0]))
-                    this.sharedService.showConfirmation(this.prepareMessage(elemento, this.model[0], this.visual[0])).subscribe(accept => {
-                        if (accept) {
-                            this.notify.emit({ accion, elemento });
-                        }
-                    });
-                    break;
-            }
+    protected doAction(entity: any, action: string): void {
+        switch (action) {
+            case 'autoDelete':
+                this.sharedService.showConfirmation(this.prepareMessage(entity, this.model[0], this.visual[0])).subscribe(accept => {
+                    if (accept) {
+                        this.data.splice(this.data.indexOf(entity), 1);
+                        this.dataToShow.splice(this.dataToShow.indexOf(entity), 1);
+                        this.notify.emit({ action, entity });
+                    }
+                });
+                break;
+            case 'delete':
+                this.sharedService.showConfirmation(this.prepareMessage(entity, this.model[0], this.visual[0])).subscribe(accept => {
+                    if (accept) {
+                        this.notify.emit({ action, entity });
+                    }
+                });
+                break;
+            default:
+                this.notify.emit({ action, entity });
+                break;
         }
+
         if (this.overlayRef) this.close();
     }
 
@@ -134,7 +136,7 @@ export class GTTableComponent extends GTTableBase implements OnInit, AfterViewIn
             }
             if (preSelect) this.searchApp.control.setValue(element[this.model[0]])
 
-            this.notify.emit({ accion: 'select', element: this.selectedElement });
+            this.notify.emit({ action: 'select', element: this.selectedElement });
         }
     }
 
@@ -157,7 +159,7 @@ export class GTTableComponent extends GTTableBase implements OnInit, AfterViewIn
                 else this.doAction(dato, accion);
             }
         });
-        if (this.subjectLoaded) this.notify.emit({ elemento: agrupacionEventos, accion: accion + 's' });
+        if (this.subjectLoaded) this.notify.emit({ elemento: agrupacionEventos, action: accion + 's' });
 
     }
 

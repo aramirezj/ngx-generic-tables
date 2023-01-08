@@ -15,6 +15,9 @@ import { ComponentsComponent } from './components/components.component';
 import { ClassesComponent } from './classes/classes.component';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { GTTableComponent } from 'projects/ngx-generic-tables/src/lib/components/tabla/tabla.component';
+import { GTInfiniteTableComponent } from 'projects/ngx-generic-tables/src/lib/components/tabla-infinita/tabla-infinita.component';
+
 
 @NgModule({
   declarations: [AppComponent, ComponentsComponent, ClassesComponent],
@@ -29,7 +32,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     MatIconModule,
     MatButtonModule,
     MatInputModule,
-    MatFormFieldModule
+    MatFormFieldModule,
+    GTTableComponent,
+    GTInfiniteTableComponent
   ],
   providers: [
     {
