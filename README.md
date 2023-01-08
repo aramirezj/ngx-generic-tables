@@ -1,4 +1,4 @@
-# NgxGenericForm
+# NgxGenericTables
 
 The purpose of this library is to offer a wide selection of generic tools for forms powered by material through standalone components and directives
 
@@ -20,4 +20,4 @@ Currently English and Spanish is supported, the library will detect it throught 
 
 ## Similar library
 
-[ngx-generic-form](https://www.npmjs.com/package/@aramirezj/ngx-generic-form/)Library of utilities for forms powered by Angular material
+[ngx-generic-form](https://www.npmjs.com/package/@aramirezj/ngx-generic-form/) Library of utilities for forms powered by Angular material
