@@ -1,6 +1,6 @@
 # NgxGenericTables
 
-The purpose of this library is to offer a wide selection of generic tools for forms powered by material through standalone components and directives
+The purpose of this library is to offer a wide selection of generic tools for displaying and handling data through tables powered by material with standalone components and directives
 
 ## Note
 
