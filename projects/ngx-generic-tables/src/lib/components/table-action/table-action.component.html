@@ -1,5 +1,5 @@
 <button *ngIf="actionMenu && action.purpose !== 'huecoVacio' " mat-menu-item (click)="clicked.emit(this.action.purpose)"
-    [class]="disabled ? 'disabled' : ''">
+    [class]="disabled ? 'disabled menuItem' : 'menuItem'">
     <mat-icon class="iconoMenu">{{action.icon}}</mat-icon>
     <span>{{action.description}}</span>
 </button>
