@@ -1,6 +1,6 @@
 {
   "name": "@aramirezj/ngx-generic-tables",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "peerDependencies": {
     "@angular/common": "^15.0.4",
     "@angular/core": "^15.0.4",
