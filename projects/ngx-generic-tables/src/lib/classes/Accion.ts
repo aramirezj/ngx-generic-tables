@@ -27,8 +27,8 @@ export class GT_Action {
         public disabled: boolean = false
 
     ) {
-        this.description = GT_Action.catalog[this.purpose].description;
-        this.icon = GT_Action.catalog[this.purpose].icon;
+        this.description = this.description ?? GT_Action.catalog[this.purpose].description;
+        this.icon = this.icon ?? GT_Action.catalog[this.purpose].icon;
         this.disabled = disabled ?? false;
     }
 
