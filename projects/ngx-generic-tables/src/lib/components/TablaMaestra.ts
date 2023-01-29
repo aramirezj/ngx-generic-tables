@@ -1,14 +1,20 @@
 import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
-import { Component, EventEmitter, HostListener, Input, Output, Renderer2, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, HostListener, inject, Input, Output, Renderer2, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { MatSelectionList } from '@angular/material/list';
 import { Sort } from '@angular/material/sort';
 import { BehaviorSubject, filter, fromEvent, Subscription, take } from 'rxjs';
 import { GT_Action } from '../classes/Accion';
 import { SharedService } from '../shared.service';
 import { GTSearcherComponent } from './searcher/searcher.component';
+import { ChangeDetectionStrategy } from '@angular/compiler';
 
-
+/** Interface cookie */
+interface CookieColumn {
+    original: string,
+    actual: string
+}
 
 /** Tabla Maestra de la que partirán las demás implementando sus atributos y funciones comunes */
 @Component({
@@ -25,6 +31,8 @@ export abstract class GTTableBase {
     @ViewChild(MatPaginator, { static: false }) paginatorC!: MatPaginator;
     //Context menu
     @ViewChild('menuContextual') protected menuContextual!: TemplateRef<any>;
+    /** Column handler reference */
+    @ViewChild(MatSelectionList, { static: false }) columnHandler!: MatSelectionList;
     /**Attribute with the collection of data to show*/
     @Input() data: any[] = [];
     /**Columns to display in the table*/
@@ -101,6 +109,11 @@ export abstract class GTTableBase {
     protected subMenu: Subscription | null = null;
     /** EventEmitter to control that even in several tables, only one menu can be open */
     protected subscriptionMenuService: Subscription | null = null;
+    /** Original model gathered when the table starts */
+    protected originalModel: string[] = [];
+    /** Original columns gathered when the table starts */
+    protected originalColumns: string[] = [];
+    cdRef:ChangeDetectorRef = inject(ChangeDetectorRef);
 
 
     constructor(
@@ -109,8 +122,93 @@ export abstract class GTTableBase {
         public overlay: Overlay,
         public viewContainerRef: ViewContainerRef
     ) {
+      
     }
 
+    ngAfterViewChecked(){
+        this.cdRef.detectChanges();
+    }
+
+
+
+    /** Función que, genera al inicio una copia de los modelos y columnas utilizados
+     * Se suscribe a los cambios del menú de columnas, gestiona las selecciones y deselecciones para añadir y quitar
+     * y después ordenaa según el original
+     */
+    protected prepareColumnHandler() {
+        const originalModel = [...this.model]
+        const originalColumns = [...this.visual];
+
+        /** Obtiene la cookie y actualiza el modelo y visual */
+        const cookieColumns: CookieColumn | undefined = this.getTableCookie();
+        if (cookieColumns) {
+            this.model = JSON.parse(cookieColumns.actual);
+            this.visual = [];
+            const indices: string[] = [];
+            for (let i = 0; i < this.model.length; i++) {
+                const indexModel: number = originalModel.indexOf(this.model[i])
+                indices.push(indexModel.toString())
+                this.visual.push(originalColumns[indexModel]);
+
+            }
+            this.columnHandler.writeValue(indices);
+
+        }
+        this.originalColumns = originalColumns;
+        this.originalModel = originalModel;
+
+
+        this.columnHandler.selectionChange.subscribe(selectedItem => {
+            console.log(selectedItem)
+            const modelChanged: number = selectedItem.options[0].value;
+            if (!selectedItem.options[0].selected) {
+                if (this.model.length > 1) {
+                    this.model.splice(this.model.indexOf(originalModel[modelChanged]), 1);
+                    this.visual.splice(this.visual.indexOf(originalColumns[modelChanged]), 1);
+                }
+
+
+            } else {
+                this.model.splice(modelChanged, 0, originalModel.at(modelChanged) as string);
+                this.visual.splice(modelChanged, 0, originalColumns.at(modelChanged) as string);
+                this.model.sort((a, b) => originalModel.indexOf(a) - originalModel.indexOf(b));
+                this.visual.sort((a, b) => originalColumns.indexOf(a) - originalColumns.indexOf(b));
+            }
+
+            this.handleCookieColumns();
+            this.seteaColumnasTamanios(this.tamanioInicial);
+
+        })
+    }
+
+    /** Gestiona la lógica de reemplazar la cookie para la tabla en cuestión */
+    protected handleCookieColumns() {
+
+        const cookiesHandler: CookieColumn[] = this.getCookieColumns();
+        const json: string = JSON.stringify(this.originalModel);
+        const tableFound: number = cookiesHandler.findIndex(cookie => cookie.original === json);
+        if (tableFound !== -1) cookiesHandler.splice(tableFound, 1);
+        cookiesHandler.push({ original: json, actual: JSON.stringify(this.model) });
+        localStorage.setItem("tablasColumns", JSON.stringify(cookiesHandler));
+    }
+
+    /**
+     * Obtiene la cookie en concreto asignada a esta tabla
+     * @returns La cookie asignada
+     */
+    protected getTableCookie(): CookieColumn | undefined {
+        const cookiesHandler: CookieColumn[] = this.getCookieColumns();
+        const tableFound: CookieColumn | undefined = cookiesHandler.find(cookie => cookie.original === JSON.stringify(this.originalModel));
+        return tableFound;
+    }
+
+    /**
+     * Obtiene el listado de cookies. Si no, array vacio
+     * @returns Listado de cookies
+     */
+    protected getCookieColumns(): CookieColumn[] {
+        return localStorage.getItem("tablasColumns") ? JSON.parse(localStorage.getItem("tablasColumns") as string) : [];
+    }
 
     /**
      * Pagination logic
@@ -277,15 +375,14 @@ export abstract class GTTableBase {
      * @param anchuraTabla Anchura actual de la tabla
      */
     protected seteaColumnasTamanios(anchuraTabla: number): void {
+        this.columnasTamanio.length = 0;
         //Si no se ha detectado el tamaño de la tabla por la razón que sea, la seteamos a 5000 para que tenga de sobra
         this.tamanioInicial = anchuraTabla;
-        let iTotal: number = 0;
         let numeroColumnas = this.model.length;
         if (this.actions || (!this.fxFlexes)) numeroColumnas += 0.5;
         const widthBase: number = 100 / numeroColumnas;
         for (let i = 0; i < this.model.length; i++) {
             this.columnasTamanio.push({ field: this.model[i], width: this.fxFlexes ? this.fxFlexes[i] : widthBase });
-            iTotal++;
         }
 
 
@@ -295,6 +392,7 @@ export abstract class GTTableBase {
         this.columnasTamanio.forEach((column) => {
             totWidth += column.width;
         });
+        this.columnasTamanio.at(-1)!.width = 0;
         const scale = (anchuraTabla - 5) / totWidth;
         this.columnasTamanio.forEach((column) => {
             column.width *= scale;
@@ -452,6 +550,7 @@ export abstract class GTTableBase {
     */
     @HostListener('window:resize', ['$event'])
     onResize(): void {
+        console.log('resize')
         this.seteaColumnasTamanios(this.matTableRef.clientWidth);
     }
 

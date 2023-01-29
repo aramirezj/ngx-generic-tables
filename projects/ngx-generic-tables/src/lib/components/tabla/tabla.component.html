@@ -22,6 +22,9 @@
         <div *ngIf="actions?.length" [class]="'elementoEncabezado elementosAcciones '+idTabla+'-columna-acciones'">
             <span>{{'ACTIONS' | translate}}</span>
         </div>
+        <span class="elementoEncabezado huecoMenu">
+            <ng-container [ngTemplateOutlet]="menuHandler"></ng-container>
+        </span>
 
 
     </div>
@@ -110,6 +113,9 @@
                 (clicked)="doAction(elemento,$event)"></gt-table-action>
         </ng-container>
     </div>
+
+    <span class="elementoContenido huecoMenu"></span>
+
 </ng-template>
 
 
@@ -130,4 +136,17 @@
                 (clicked)="doAction(elemento,$event)"></gt-table-action>
         </div>
     </section>
+</ng-template>
+
+<ng-template #menuHandler>
+    <button mat-icon-button [matMenuTriggerFor]="menuColumn" class="columnMenu" >
+        <mat-icon class="menuIcon" *ngIf="originalModel.length  && model.length" [matBadge]="originalModel.length - model.length > 0 ? originalModel.length - model.length : null" matBadgeColor="accent">more_vert</mat-icon>
+        <mat-menu #menuColumn="matMenu">
+            <mat-selection-list (click)="$event.stopPropagation()">
+                <mat-list-option [disabled]="model.length === 1 && model.includes(modelOr)" [selected]="model.includes(modelOr)" [value]="i" *ngFor="let modelOr of originalModel;let i = index">
+                    {{originalColumns[i]}}
+                </mat-list-option>
+            </mat-selection-list>
+        </mat-menu>
+    </button>
 </ng-template>

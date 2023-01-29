@@ -202,6 +202,37 @@
     display: inline-block;
 }
 
+.columnMenu {
+    color: white;
+    width: 25px;
+    
+    .menuIcon {
+        vertical-align: bottom;
+    }
+
+}
+.huecoMenu{
+    width: 0!important;
+    padding: 0!important;
+    margin:0!important;
+    //Para sobrescribir los 25px añadidos de la cabecera
+    margin-left: -33px!important;
+    display: initial!important;
+}
+::ng-deep{
+    .menuIcon{
+        .mat-badge-content{
+            font-size: 9px!important;
+            width: 15px!important;
+            height: 12px!important;
+            line-height: 12px!important;
+            right: -3px!important;
+            top: -5px!important;
+        }
+    }
+
+}
+
 /* Animatinons */
 @-webkit-keyframes fadeIn {
     from {

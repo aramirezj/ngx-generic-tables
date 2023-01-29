@@ -2,11 +2,15 @@ import { trigger, transition, style, animate } from '@angular/animations';
 import { Overlay } from '@angular/cdk/overlay';
 import { NgFor, NgIf, NgSwitch, NgSwitchCase, NgTemplateOutlet } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Output, Renderer2, ViewChild, ViewContainerRef } from '@angular/core';
+import { MatBadgeModule } from '@angular/material/badge';
+import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
+import { MatIconModule } from '@angular/material/icon';
+import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { BehaviorSubject, Subject, Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { GT_Action } from '../../classes/Accion';
 import { GT_APIRequest } from '../../classes/APIRequest';
 import { GTTranslatePipe } from '../../directives/translate.directive';
@@ -40,7 +44,7 @@ import { GTTableElementComponent } from '../table-element/table-element.componen
     ],
     inputs: GTTableBase.commonInputs,
     standalone: true,
-    imports: [NgIf, NgFor, NgSwitch, NgSwitchCase, NgTemplateOutlet, GTTranslatePipe, GTSearcherComponent, GTTableElementComponent, GTTableActionComponent, MatCheckboxModule, MatPaginatorModule, MatMenuModule, MatTooltipModule, GTTableComponent]
+    imports: [NgIf, NgFor, NgSwitch, NgSwitchCase, NgTemplateOutlet, GTTranslatePipe, GTSearcherComponent, GTTableElementComponent, GTTableActionComponent, MatCheckboxModule, MatPaginatorModule, MatMenuModule, MatTooltipModule, GTTableComponent, MatIconModule, MatBadgeModule, MatButtonModule, MatListModule]
 })
 export class GTInfiniteTableComponent extends GTTableBase implements OnInit, AfterViewInit {
     /** Child Table instance */
@@ -105,6 +109,7 @@ export class GTInfiniteTableComponent extends GTTableBase implements OnInit, Aft
         if (this.preselectedElement) this.select(this.preselectedElement.data);
         this.matTableRef = this.elRef.nativeElement.querySelector(`#${this.idTabla}`);
         this.seteaColumnasTamanios(this.matTableRef.clientWidth);
+        this.prepareColumnHandler();
 
     }
 

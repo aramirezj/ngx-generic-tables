@@ -20,6 +20,7 @@
         <!--Encabezado de las acciones -->
         <div [class]="'elementoEncabezado elementosAcciones '+idTabla+'-columna-acciones'">
             <span>{{'ACTIONS' | translate}}</span>
+            <ng-container [ngTemplateOutlet]="menuHandler"></ng-container>
         </div>
 
 
@@ -179,3 +180,18 @@
         </div>
     </section>
 </ng-template>
+
+<ng-template #menuHandler>
+    <button mat-icon-button [matMenuTriggerFor]="menuColumn" class="columnMenu" *ngIf="originalModel && model">
+        <mat-icon class="menuIcon" [matBadge]="originalModel.length - model.length > 0 ? originalModel.length - model.length : null" matBadgeColor="accent">more_vert</mat-icon>
+        <mat-menu #menuColumn="matMenu">
+            <mat-selection-list (click)="$event.stopPropagation()">
+                <mat-list-option [disabled]="model.length === 1 && model.includes(modelOr)" [selected]="model.includes(modelOr)" [value]="i" *ngFor="let modelOr of originalModel;let i = index">
+                    {{originalColumns[i]}}
+                </mat-list-option>
+            </mat-selection-list>
+        </mat-menu>
+    </button>
+</ng-template>
+
+

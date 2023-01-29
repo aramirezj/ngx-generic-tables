@@ -13,6 +13,11 @@ import { MatMenuModule } from '@angular/material/menu';
 import { DialogModule } from '@angular/cdk/dialog';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { GTTranslatePipe } from '../../directives/translate.directive';
+import { MatIconModule } from '@angular/material/icon';
+import { MatBadgeModule } from '@angular/material/badge';
+import { MatListModule } from '@angular/material/list';
+import { MatButtonModule } from '@angular/material/button';
+
 /** Componente de la Tabla encargada del listado y tratado de elementos */
 @Component({
     selector: 'gt-table',
@@ -20,7 +25,7 @@ import { GTTranslatePipe } from '../../directives/translate.directive';
     styleUrls: ['./tabla.component.scss'],
     inputs: GTTableBase.commonInputs,
     standalone: true,
-    imports: [NgIf, NgFor, NgSwitch, NgSwitchCase, NgTemplateOutlet,GTTranslatePipe, GTSearcherComponent, GTTableElementComponent, GTTableActionComponent, MatCheckboxModule, MatPaginatorModule, MatMenuModule, DialogModule, MatSnackBarModule]
+    imports: [NgIf, NgFor, NgSwitch, NgSwitchCase, NgTemplateOutlet, GTTranslatePipe, GTSearcherComponent, GTTableElementComponent, GTTableActionComponent, MatCheckboxModule, MatPaginatorModule, MatMenuModule, MatButtonModule, DialogModule, MatSnackBarModule, MatIconModule, MatBadgeModule, MatListModule]
 })
 export class GTTableComponent extends GTTableBase implements OnInit, AfterViewInit {
     /** Referencia a la propia tabla */
@@ -46,9 +51,11 @@ export class GTTableComponent extends GTTableBase implements OnInit, AfterViewIn
     ngAfterViewInit(): void {
         if (this.preselectedElement) this.select(this.preselectedElement.data, this.preselectedElement.primaryKey, true);
         if (this.subjectLoaded) this.subjectLoaded.next(this);
-
+        
         this.matTableRef = this.elRef.nativeElement.querySelector(`#${this.idTabla}`);
+        this.prepareColumnHandler();
         this.seteaColumnasTamanios(this.matTableRef.clientWidth);
+
     }
 
     /** Preparación inicial de herramientas necesarias para la tabla */
